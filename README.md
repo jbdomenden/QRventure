@@ -26,15 +26,15 @@ A mobile-first tourism website for Intramuros built with **Kotlin + Ktor + Postg
 ## IntelliJ + PostgreSQL Run Instructions
 1. **Create database**
    ```sql
-   CREATE DATABASE qrventure;
+   CREATE DATABASE qrventure_db;
    ```
 2. **Set credentials** in `src/main/resources/application.yaml`:
-   - `postgres.url: jdbc:postgresql://localhost:5432/qrventure`
+   - `postgres.url: jdbc:postgresql://localhost:5434/qrventure_db`
    - `postgres.user`
    - `postgres.password`
 3. **Open in IntelliJ** as a Gradle project.
 4. Run `ApplicationKt`.
-5. Open `http://localhost:8080/qrventure`.
+5. Open `http://localhost:6000/qrventure`.
 
 On startup, schema + Intramuros seed data are automatically created if tables are empty.
 

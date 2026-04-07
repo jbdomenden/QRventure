@@ -9,6 +9,7 @@ fun Application.configureSiteRoutes() {
     routing {
         get("/") { call.respondRedirect("/qrventure", permanent = false) }
         get("/qrventure") { call.respondRedirect("/qrventure/index.html", permanent = false) }
+        get("/qrventure/") { call.respondRedirect("/qrventure/index.html", permanent = false) }
 
         listOf("attractions", "attraction-detail", "dining", "dining-detail", "services", "service-detail", "navigation").forEach { page ->
             get("/qrventure/$page") { call.respondRedirect("/qrventure/$page.html", permanent = false) }
