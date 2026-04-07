@@ -1,5 +1,8 @@
 package app.QRventure
 
+import app.QRventure.db.DatabaseFactory
+import app.QRventure.route.configureApiRoutes
+import app.QRventure.route.configureSiteRoutes
 import io.ktor.server.application.*
 
 fun main(args: Array<String>) {
@@ -8,8 +11,20 @@ fun main(args: Array<String>) {
 
 fun Application.module() {
     configureHTTP()
-    configureSecurity()
     configureSerialization()
-    configureDatabases()
-    configureRouting()
+
+    val connection = runCatching { DatabaseFactory.connect(environment.config) }
+        .onFailure { log.error("Database connection failed. Site pages will still be served, but APIs will return 503.", it) }
+        .getOrNull()
+
+    if (connection != null) {
+        DatabaseFactory.initializeSchema(connection)
+        DatabaseFactory.seedData(connection)
+        monitor.subscribe(ApplicationStopping) {
+            connection.close()
+        }
+    }
+
+    configureApiRoutes(connection)
+    configureSiteRoutes()
 }
