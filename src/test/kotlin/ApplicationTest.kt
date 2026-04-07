@@ -7,15 +7,18 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class ApplicationTest {
-
     @Test
-    fun testRoot() = testApplication {
-        application {
-            module()
+    fun testRootRedirects() = testApplication {
+        environment {
+            config = MapApplicationConfig(
+                "postgres.url" to "jdbc:h2:mem:test;DB_CLOSE_DELAY=-1",
+                "postgres.user" to "sa",
+                "postgres.password" to ""
+            )
         }
-        client.get("/").apply {
-            assertEquals(HttpStatusCode.OK, status)
-        }
-    }
+        application { module() }
 
+        val response = client.get("/")
+        assertEquals(HttpStatusCode.Found, response.status)
+    }
 }
