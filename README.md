@@ -34,7 +34,7 @@ A mobile-first tourism website for Intramuros built with **Kotlin + Ktor + Postg
    - `postgres.password`
 3. **Open in IntelliJ** as a Gradle project.
 4. Run `ApplicationKt`.
-5. Open `http://localhost:6000/` (root loads QRventure homepage directly).
+5. Open `http://localhost:8020/` (root loads QRventure homepage directly).
 
 On startup, schema + Intramuros seed data are automatically created if tables are empty.
 
@@ -81,3 +81,6 @@ Direct navigation to major pages must also work cleanly.
 
 Repository-aware correction:
 This repository is still very close to the generated Ktor starter template. Replace the starter root endpoint behavior with actual homepage delivery. The first visible result in the browser must be the tourism website homepage, not a placeholder response.
+
+
+Port note: many Chromium-based browsers block port 6000 (`ERR_UNSAFE_PORT`). Use 8020 (default) for local browser testing.
