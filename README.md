@@ -1,49 +1,71 @@
-# QRventure
+# QRventure Intramuros Tourism Website
 
-This project was created using the [Ktor Project Generator](https://start.ktor.io).
+A mobile-first tourism website for Intramuros built with **Kotlin + Ktor + PostgreSQL + plain HTML/CSS/JS**.
 
-Here are some useful links to get you started:
+## Architecture Summary
+- **Backend (Ktor)**
+  - `DatabaseFactory`: JDBC connection, schema creation, and Intramuros seed data.
+  - `TourismService`: safe prepared statements and query logic.
+  - API routes under `/api` for featured content, module listings/details, and global search.
+  - Site routes for `/`, `/qrventure`, and direct page entry points.
+- **Frontend (static under `src/main/resources/static/qrventure`)**
+  - Multi-page app (MPA), mobile-first responsive pages.
+  - Shared design token CSS aligned to the provided warm editorial style.
+  - Modular JavaScript for home, listing, detail, and navigation/search pages.
 
-- [Ktor Documentation](https://ktor.io/docs/home.html)
-- [Ktor GitHub page](https://github.com/ktorio/ktor)
-- The [Ktor Slack chat](https://app.slack.com/client/T09229ZC6/C0A974TJ9). You'll need
-  to [request an invite](https://surveys.jetbrains.com/s3/kotlin-slack-sign-up) to join.
+## API Endpoints
+- `GET /api/featured`
+- `GET /api/attractions?q=&category=`
+- `GET /api/attractions/{slug-or-id}`
+- `GET /api/dining?type=`
+- `GET /api/dining/{slug-or-id}`
+- `GET /api/services?type=`
+- `GET /api/services/{slug-or-id}`
+- `GET /api/search?q=`
 
-## Features
+## IntelliJ + PostgreSQL Run Instructions
+1. **Create database**
+   ```sql
+   CREATE DATABASE qrventure;
+   ```
+2. **Set credentials** in `src/main/resources/application.yaml`:
+   - `postgres.url: jdbc:postgresql://localhost:5432/qrventure`
+   - `postgres.user`
+   - `postgres.password`
+3. **Open in IntelliJ** as a Gradle project.
+4. Run `ApplicationKt`.
+5. Open `http://localhost:8080/qrventure`.
 
-Here's a list of features included in this project:
+On startup, schema + Intramuros seed data are automatically created if tables are empty.
 
-| Name                                                                   | Description                                                                        |
-|------------------------------------------------------------------------|------------------------------------------------------------------------------------|
-| [Default Headers](https://start.ktor.io/p/default-headers)             | Adds a default set of headers to HTTP responses                                    |
-| [Routing](https://start.ktor.io/p/routing)                             | Provides a structured routing DSL                                                  |
-| [Simple Cache](https://start.ktor.io/p/simple-cache)                   | Provides API for cache management                                                  |
-| [Simple Memory Cache](https://start.ktor.io/p/simple-memory-cache)     | Provides memory cache for Simple Cache plugin                                      |
-| [Authentication](https://start.ktor.io/p/auth)                         | Provides extension point for handling the Authorization header                     |
-| [Authentication JWT](https://start.ktor.io/p/auth-jwt)                 | Handles JSON Web Token (JWT) bearer authentication scheme                          |
-| [Static Content](https://start.ktor.io/p/static-content)               | Serves static files from defined locations                                         |
-| [Content Negotiation](https://start.ktor.io/p/content-negotiation)     | Provides automatic content conversion according to Content-Type and Accept headers |
-| [kotlinx.serialization](https://start.ktor.io/p/kotlinx-serialization) | Handles JSON serialization using kotlinx.serialization library                     |
-| [Postgres](https://start.ktor.io/p/postgres)                           | Adds Postgres database to your application                                         |
-
-## Building & Running
-
-To build or run the project, use one of the following tasks:
-
-| Task                                    | Description                                                          |
-|-----------------------------------------|----------------------------------------------------------------------|
-| `./gradlew test`                        | Run the tests                                                        |
-| `./gradlew build`                       | Build everything                                                     |
-| `./gradlew buildFatJar`                 | Build an executable JAR of the server with all dependencies included |
-| `./gradlew buildImage`                  | Build the docker image to use with the fat JAR                       |
-| `./gradlew publishImageToLocalRegistry` | Publish the docker image locally                                     |
-| `./gradlew run`                         | Run the server                                                       |
-| `./gradlew runDocker`                   | Run using the local docker image                                     |
-
-If the server starts successfully, you'll see the following output:
-
+## Project Tree (key files)
 ```
-2024-12-04 14:32:45.584 [main] INFO  Application - Application started in 0.303 seconds.
-2024-12-04 14:32:45.682 [main] INFO  Application - Responding at http://0.0.0.0:8080
+src/main/kotlin/
+  Application.kt
+  HTTP.kt
+  Serialization.kt
+  app/QRventure/db/DatabaseFactory.kt
+  app/QRventure/model/Models.kt
+  app/QRventure/dto/Responses.kt
+  app/QRventure/service/TourismService.kt
+  app/QRventure/route/ApiRoutes.kt
+  app/QRventure/route/SiteRoutes.kt
+src/main/resources/
+  application.yaml
+  static/qrventure/
+    index.html
+    attractions.html
+    attraction-detail.html
+    dining.html
+    dining-detail.html
+    services.html
+    service-detail.html
+    navigation.html
+    css/styles.css
+    js/api.js
+    js/home.js
+    js/listing.js
+    js/detail.js
+    js/navigation.js
+    images/*.svg
 ```
-
