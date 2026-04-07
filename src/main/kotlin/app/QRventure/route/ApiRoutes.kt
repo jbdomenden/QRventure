@@ -8,11 +8,21 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import java.sql.Connection
 
-fun Application.configureApiRoutes(connection: Connection) {
-    val service = TourismService(connection)
-
+fun Application.configureApiRoutes(connection: Connection?) {
     routing {
         route("/api") {
+            if (connection == null) {
+                get("/{...}") {
+                    call.respond(
+                        HttpStatusCode.ServiceUnavailable,
+                        ErrorResponse("Database is unavailable. Check postgres settings and restart the server.")
+                    )
+                }
+                return@route
+            }
+
+            val service = TourismService(connection)
+
             get("/featured") { call.respond(service.featured()) }
 
             get("/attractions") {

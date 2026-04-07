@@ -13,12 +13,16 @@ fun Application.module() {
     configureHTTP()
     configureSerialization()
 
-    val connection = DatabaseFactory.connect(environment.config)
-    DatabaseFactory.initializeSchema(connection)
-    DatabaseFactory.seedData(connection)
+    val connection = runCatching { DatabaseFactory.connect(environment.config) }
+        .onFailure { log.error("Database connection failed. Site pages will still be served, but APIs will return 503.", it) }
+        .getOrNull()
 
-    monitor.subscribe(ApplicationStopping) {
-        connection.close()
+    if (connection != null) {
+        DatabaseFactory.initializeSchema(connection)
+        DatabaseFactory.seedData(connection)
+        monitor.subscribe(ApplicationStopping) {
+            connection.close()
+        }
     }
 
     configureApiRoutes(connection)
