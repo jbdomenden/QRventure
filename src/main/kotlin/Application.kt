@@ -1,5 +1,8 @@
 package app.QRventure
 
+import app.QRventure.db.DatabaseFactory
+import app.QRventure.route.configureApiRoutes
+import app.QRventure.route.configureSiteRoutes
 import io.ktor.server.application.*
 
 fun main(args: Array<String>) {
@@ -8,8 +11,16 @@ fun main(args: Array<String>) {
 
 fun Application.module() {
     configureHTTP()
-    configureSecurity()
     configureSerialization()
-    configureDatabases()
-    configureRouting()
+
+    val connection = DatabaseFactory.connect(environment.config)
+    DatabaseFactory.initializeSchema(connection)
+    DatabaseFactory.seedData(connection)
+
+    monitor.subscribe(ApplicationStopping) {
+        connection.close()
+    }
+
+    configureApiRoutes(connection)
+    configureSiteRoutes()
 }
