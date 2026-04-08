@@ -29,6 +29,6 @@ fun Application.module() {
     }
 
     configurePublicApiRoutes(connection)
-    configureAdminRoutes()
+    configureAdminRoutes(connection)
     configurePublicSiteRoutes()
 }
