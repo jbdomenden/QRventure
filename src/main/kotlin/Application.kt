@@ -1,8 +1,10 @@
 package app.QRventure
 
+import app.QRventure.auth.configureAdminAuth
 import app.QRventure.db.DatabaseFactory
-import app.QRventure.route.configureApiRoutes
-import app.QRventure.route.configureSiteRoutes
+import app.QRventure.routes.configureAdminRoutes
+import app.QRventure.routes.configurePublicApiRoutes
+import app.QRventure.routes.configurePublicSiteRoutes
 import io.ktor.server.application.*
 
 fun main(args: Array<String>) {
@@ -12,6 +14,7 @@ fun main(args: Array<String>) {
 fun Application.module() {
     configureHTTP()
     configureSerialization()
+    configureAdminAuth()
 
     val connection = runCatching { DatabaseFactory.connect(environment.config) }
         .onFailure { log.error("Database connection failed. Site pages will still be served, but APIs will return 503.", it) }
@@ -25,6 +28,7 @@ fun Application.module() {
         }
     }
 
-    configureApiRoutes(connection)
-    configureSiteRoutes()
+    configurePublicApiRoutes(connection)
+    configurePublicSiteRoutes()
+    configureAdminRoutes()
 }

@@ -8,7 +8,7 @@ import kotlin.test.assertEquals
 
 class ApplicationTest {
     @Test
-    fun testRootRedirects() = testApplication {
+    fun testRootServesHomepage() = testApplication {
         environment {
             config = MapApplicationConfig(
                 "postgres.url" to "jdbc:h2:mem:test;DB_CLOSE_DELAY=-1",
@@ -19,6 +19,6 @@ class ApplicationTest {
         application { module() }
 
         val response = client.get("/")
-        assertEquals(HttpStatusCode.Found, response.status)
+        assertEquals(HttpStatusCode.OK, response.status)
     }
 }
