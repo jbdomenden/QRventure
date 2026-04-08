@@ -80,3 +80,34 @@ src/main/resources/
     images/
       *.svg
 ```
+
+## Phase 2: Database Schema + Seed Logic
+Implemented in `src/main/kotlin/app/QRventure/db/DatabaseFactory.kt`:
+- Tables: `admins`, `attractions`, `dining_places`, `local_services`, `tour_routes`.
+- Admin seed:
+  - `admin@qrventure.local`
+  - password seed source `Admin123!` stored hashed (`sha256:<base64>` format).
+- Attraction seed includes:
+  - Fort Santiago
+  - San Agustin Church
+  - Casa Manila
+  - Baluarte de San Diego
+  - Manila Cathedral
+  - Plaza Roma
+  - Puerta del Parian
+  - Puerta Real Gardens
+- Dining seed includes:
+  - heritage cafes
+  - Filipino restaurants
+  - coffee stops
+- Services seed includes:
+  - restroom
+  - ATM
+  - parking
+  - police
+  - info center
+- Tour routes seed includes:
+  - Historic Core
+  - Fort Route
+  - Church Route
+  - 1-Hour Route
