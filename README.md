@@ -1,49 +1,125 @@
-# QRventure
+# QRventure Intramuros Tourism Website
 
-This project was created using the [Ktor Project Generator](https://start.ktor.io).
+A mobile-first tourism website for Intramuros built with **Kotlin + Ktor + PostgreSQL + plain HTML/CSS/JS**.
 
-Here are some useful links to get you started:
+## Phase 1 Foundation (Current)
+- Root endpoint `/` serves the real public homepage: `static/qrventure/index.html`.
+- Structured backend packages established for:
+  - `config`
+  - `db`
+  - `models`
+  - `dto`
+  - `services`
+  - `routes`
+  - `auth`
+  - `utils`
+- Route scaffolding in place for:
+  - Public pages
+  - Public APIs
+  - Admin pages and admin API health scaffold
+- Static structure created under `static/qrventure` including `admin/` and `uploads/`.
 
-- [Ktor Documentation](https://ktor.io/docs/home.html)
-- [Ktor GitHub page](https://github.com/ktorio/ktor)
-- The [Ktor Slack chat](https://app.slack.com/client/T09229ZC6/C0A974TJ9). You'll need
-  to [request an invite](https://surveys.jetbrains.com/s3/kotlin-slack-sign-up) to join.
+## IntelliJ + PostgreSQL Run Instructions
+1. Create database:
+   ```sql
+   CREATE DATABASE qrventure_db;
+   ```
+2. Configure `src/main/resources/application.yaml`:
+   - `postgres.url: jdbc:postgresql://localhost:5434/qrventure_db`
+   - `postgres.user`
+   - `postgres.password`
+3. Run `ApplicationKt` in IntelliJ.
+4. Open `http://localhost:8020/`.
 
-## Features
-
-Here's a list of features included in this project:
-
-| Name                                                                   | Description                                                                        |
-|------------------------------------------------------------------------|------------------------------------------------------------------------------------|
-| [Default Headers](https://start.ktor.io/p/default-headers)             | Adds a default set of headers to HTTP responses                                    |
-| [Routing](https://start.ktor.io/p/routing)                             | Provides a structured routing DSL                                                  |
-| [Simple Cache](https://start.ktor.io/p/simple-cache)                   | Provides API for cache management                                                  |
-| [Simple Memory Cache](https://start.ktor.io/p/simple-memory-cache)     | Provides memory cache for Simple Cache plugin                                      |
-| [Authentication](https://start.ktor.io/p/auth)                         | Provides extension point for handling the Authorization header                     |
-| [Authentication JWT](https://start.ktor.io/p/auth-jwt)                 | Handles JSON Web Token (JWT) bearer authentication scheme                          |
-| [Static Content](https://start.ktor.io/p/static-content)               | Serves static files from defined locations                                         |
-| [Content Negotiation](https://start.ktor.io/p/content-negotiation)     | Provides automatic content conversion according to Content-Type and Accept headers |
-| [kotlinx.serialization](https://start.ktor.io/p/kotlinx-serialization) | Handles JSON serialization using kotlinx.serialization library                     |
-| [Postgres](https://start.ktor.io/p/postgres)                           | Adds Postgres database to your application                                         |
-
-## Building & Running
-
-To build or run the project, use one of the following tasks:
-
-| Task                                    | Description                                                          |
-|-----------------------------------------|----------------------------------------------------------------------|
-| `./gradlew test`                        | Run the tests                                                        |
-| `./gradlew build`                       | Build everything                                                     |
-| `./gradlew buildFatJar`                 | Build an executable JAR of the server with all dependencies included |
-| `./gradlew buildImage`                  | Build the docker image to use with the fat JAR                       |
-| `./gradlew publishImageToLocalRegistry` | Publish the docker image locally                                     |
-| `./gradlew run`                         | Run the server                                                       |
-| `./gradlew runDocker`                   | Run using the local docker image                                     |
-
-If the server starts successfully, you'll see the following output:
-
+## Updated File Tree (Phase 1)
 ```
-2024-12-04 14:32:45.584 [main] INFO  Application - Application started in 0.303 seconds.
-2024-12-04 14:32:45.682 [main] INFO  Application - Responding at http://0.0.0.0:8080
+src/main/kotlin/
+  Application.kt
+  app/QRventure/
+    auth/
+      AdminAuth.kt
+    config/
+      AppConfig.kt
+    db/
+      DatabaseFactory.kt
+    dto/
+      Responses.kt
+    models/
+      Models.kt
+    services/
+      TourismService.kt
+    routes/
+      PublicSiteRoutes.kt
+      PublicApiRoutes.kt
+      AdminRoutes.kt
+    utils/
+      ResourceUtils.kt
+src/main/resources/
+  application.yaml
+  static/qrventure/
+    index.html
+    attractions.html
+    attraction-detail.html
+    dining.html
+    dining-detail.html
+    services.html
+    service-detail.html
+    navigation.html
+    admin/
+      index.html
+    uploads/
+      .gitkeep
+    css/
+      styles.css
+    js/
+      api.js
+      home.js
+      listing.js
+      detail.js
+      navigation.js
+    images/
+      *.svg
 ```
 
+## Phase 2: Database Schema + Seed Logic
+Implemented in `src/main/kotlin/app/QRventure/db/DatabaseFactory.kt`:
+- Tables: `admins`, `attractions`, `dining_places`, `local_services`, `tour_routes`.
+- Admin seed:
+  - `admin@qrventure.local`
+  - password seed source `Admin123!` stored hashed (`sha256:<base64>` format).
+- Attraction seed includes:
+  - Fort Santiago
+  - San Agustin Church
+  - Casa Manila
+  - Baluarte de San Diego
+  - Manila Cathedral
+  - Plaza Roma
+  - Puerta del Parian
+  - Puerta Real Gardens
+- Dining seed includes:
+  - heritage cafes
+  - Filipino restaurants
+  - coffee stops
+- Services seed includes:
+  - restroom
+  - ATM
+  - parking
+  - police
+  - info center
+- Tour routes seed includes:
+  - Historic Core
+  - Fort Route
+  - Church Route
+  - 1-Hour Route
+
+## Phase 3: Backend Core
+- DB layer: JDBC PostgreSQL/H2 connection and schema/seed initialization in `DatabaseFactory`.
+- Models: `Admin`, `Attraction`, `DiningPlace`, `LocalService`, `TourRoute`.
+- DTOs:
+  - response DTOs in `dto/Responses.kt`
+  - upsert DTOs in `dto/Requests.kt`
+- Service core (`TourismService`) now supports:
+  - CRUD for attractions, dining, services, and tour routes
+  - featured aggregation
+  - search
+  - slug-or-id lookup across entities
