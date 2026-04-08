@@ -111,3 +111,15 @@ Implemented in `src/main/kotlin/app/QRventure/db/DatabaseFactory.kt`:
   - Fort Route
   - Church Route
   - 1-Hour Route
+
+## Phase 3: Backend Core
+- DB layer: JDBC PostgreSQL/H2 connection and schema/seed initialization in `DatabaseFactory`.
+- Models: `Admin`, `Attraction`, `DiningPlace`, `LocalService`, `TourRoute`.
+- DTOs:
+  - response DTOs in `dto/Responses.kt`
+  - upsert DTOs in `dto/Requests.kt`
+- Service core (`TourismService`) now supports:
+  - CRUD for attractions, dining, services, and tour routes
+  - featured aggregation
+  - search
+  - slug-or-id lookup across entities

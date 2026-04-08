@@ -1,19 +1,9 @@
-package app.QRventure.model
+package app.QRventure.dto
 
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class Admin(
-    val id: Int,
-    val email: String,
-    val passwordHash: String,
-    val role: String,
-    val createdAt: String
-)
-
-@Serializable
-data class Attraction(
-    val id: Int,
+data class AttractionUpsertDto(
     val slug: String,
     val name: String,
     val shortDescription: String,
@@ -31,8 +21,7 @@ data class Attraction(
 )
 
 @Serializable
-data class DiningPlace(
-    val id: Int,
+data class DiningUpsertDto(
     val slug: String,
     val name: String,
     val description: String,
@@ -48,8 +37,7 @@ data class DiningPlace(
 )
 
 @Serializable
-data class LocalService(
-    val id: Int,
+data class ServiceUpsertDto(
     val slug: String,
     val name: String,
     val description: String,
@@ -66,8 +54,7 @@ data class LocalService(
 )
 
 @Serializable
-data class TourRoute(
-    val id: Int,
+data class TourRouteUpsertDto(
     val slug: String,
     val name: String,
     val durationText: String,
