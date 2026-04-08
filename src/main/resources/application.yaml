@@ -9,3 +9,9 @@ postgres:
   url: "jdbc:postgresql://localhost:5434/qrventure_db"
   user: "postgres"
   password: "root"
+
+adminAuth:
+  username: "admin"
+  passwordHash: "uuwgBkpbBLDkauDW88ClZxZDarRvu9hsHzJUJCGI2VY="
+  passwordSalt: "7FEZnOhXPhFJr4JKFEtqQQ=="
+  iterations: 120000
