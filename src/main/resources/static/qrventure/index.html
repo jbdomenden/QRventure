@@ -1,13 +1,66 @@
-<!doctype html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>QRventure Intramuros</title><link rel="stylesheet" href="/qrventure/css/styles.css"></head>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QRventure Intramuros | Discover the Walled City</title>
+  <link rel="stylesheet" href="/qrventure/css/styles.css">
+</head>
 <body>
-<header class="top-nav"><div class="container nav-inner"><a class="brand" href="/qrventure">QRventure Intramuros</a><nav class="nav-links"><a href="/qrventure/attractions">Attractions</a><a href="/qrventure/dining">Dining</a><a href="/qrventure/services">Services</a><a href="/qrventure/navigation">Navigation</a></nav></div></header>
+<header class="top-nav">
+  <div class="container nav-inner">
+    <a class="brand" href="/">QRventure Intramuros</a>
+    <nav class="nav-links">
+      <a href="/qrventure/attractions">Attractions</a>
+      <a href="/qrventure/dining">Dining</a>
+      <a href="/qrventure/services">Services</a>
+      <a href="/qrventure/routes">Routes</a>
+    </nav>
+  </div>
+</header>
+
 <main class="container">
-<section class="hero"><h1>Discover Intramuros with confidence.</h1><p>Plan your heritage walk with trusted attraction details, dining picks, and visitor services designed for mobile travelers.</p>
-<form class="search-row" id="globalSearchForm"><input id="homeSearch" class="input" placeholder="Search attractions, dining, services"><button class="btn btn-primary">Search</button></form></section>
-<section class="section"><h2>Quick access</h2><div class="grid cards"><a class="card" href="/qrventure/attractions"><h3>Attractions</h3><p>Historical landmarks and museums.</p></a><a class="card" href="/qrventure/dining"><h3>Dining</h3><p>Filipino and Spanish dining options.</p></a><a class="card" href="/qrventure/services"><h3>Local Services</h3><p>Help desks, ATMs, first aid and more.</p></a><a class="card" href="/qrventure/navigation"><h3>Navigation</h3><p>Find destinations and open map links.</p></a></div></section>
-<section class="section" id="featuredWrap"></section>
-<section class="section card"><h2>About Intramuros</h2><p>The Walled City of Manila is best explored in the early morning or late afternoon. Wear breathable clothing, carry water, and respect heritage sites by following posted visitor guidelines.</p><ul><li>Best time to visit: November to February for cooler walks.</li><li>Safety: Stay in well-lit routes and keep emergency numbers available.</li><li>Respectful tourism: Avoid littering and observe quiet zones in churches and memorial spaces.</li></ul></section>
+  <section class="hero">
+    <div class="hero-eyebrow">Historic Manila, thoughtfully explored</div>
+    <h1>Walk through centuries inside Intramuros.</h1>
+    <p>Plan your visit to Fort Santiago, San Agustin Church, Casa Manila, Manila Cathedral, and the old walls, gates, and plazas with curated guides built for travelers on mobile.</p>
+    <form class="search-row" id="globalSearchForm">
+      <input id="homeSearch" class="input" placeholder="Search landmarks, dining, and services" aria-label="Search Intramuros">
+      <select class="select" id="homeJump" aria-label="Quick jump section">
+        <option value="">Browse section</option>
+        <option value="/qrventure/attractions">Attractions</option>
+        <option value="/qrventure/routes">Walking Routes</option>
+        <option value="/qrventure/dining">Dining</option>
+      </select>
+      <button class="btn btn-primary">Find</button>
+    </form>
+  </section>
+
+  <section class="section">
+    <div class="section-header"><h2>Explore by interest</h2><p>Start with what matters to your trip.</p></div>
+    <div class="grid cards">
+      <a class="card" href="/qrventure/attractions"><h3>Heritage Landmarks</h3><p>Churches, plazas, museums, and fortifications within the old walls.</p></a>
+      <a class="card" href="/qrventure/routes"><h3>Walking Routes</h3><p>Time-based routes through major anchors and hidden corners.</p></a>
+      <a class="card" href="/qrventure/dining"><h3>Dining Picks</h3><p>Cafés and restaurants for Filipino and Spanish-influenced meals.</p></a>
+      <a class="card" href="/qrventure/services"><h3>Visitor Services</h3><p>Find practical stops like ATMs, first aid, and tourist support.</p></a>
+    </div>
+  </section>
+
+  <section class="section" id="featuredWrap"></section>
+
+  <section class="section editorial-panel">
+    <div class="section-header"><h2>Visitor essentials</h2><p>Calm and respectful travel in a living heritage district.</p></div>
+    <div class="route-list">
+      <div class="route-item"><h3>Best visiting hours</h3><p>Early mornings and late afternoons are cooler for walking and photography.</p></div>
+      <div class="route-item"><h3>What to wear</h3><p>Light clothing, comfortable shoes, and sun protection are strongly recommended.</p></div>
+      <div class="route-item"><h3>Etiquette reminders</h3><p>Keep noise low near churches and memorial areas, and follow site-specific rules.</p></div>
+    </div>
+  </section>
 </main>
-<footer class="footer"><div class="container">© QRventure Intramuros Tourism Guide</div></footer>
-<script src="/qrventure/js/api.js"></script><script src="/qrventure/js/home.js"></script>
-</body></html>
+
+<footer class="footer"><div class="container">© QRventure Intramuros · Public Tourism Guide</div></footer>
+
+<script src="/qrventure/js/api.js"></script>
+<script src="/qrventure/js/home.js"></script>
+</body>
+</html>

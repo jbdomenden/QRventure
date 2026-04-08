@@ -1,5 +1,35 @@
-<!doctype html><html><head><meta charset='UTF-8'><meta name='viewport' content='width=device-width, initial-scale=1'><title>Dining</title><link rel='stylesheet' href='/qrventure/css/styles.css'></head><body>
-<header class='top-nav'><div class='container nav-inner'><a class='brand' href='/qrventure'>QRventure</a></div></header>
-<main class='container section'><h1>Dining in Intramuros</h1><form class='search-row' method='get'><input class='input' name='type' placeholder='Filter by cuisine or dining type'><button class='btn btn-primary'>Apply</button></form><div id='items'></div></main>
-<script src='/qrventure/js/api.js'></script><script src='/qrventure/js/listing.js'></script><script>loadListing({target:'#items',endpoint:'/api/dining',type:'dining',empty:'No dining places found.',filters:[{url:'type',api:'type'}]})</script>
-</body></html>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dining in Intramuros | QRventure</title>
+  <link rel="stylesheet" href="/qrventure/css/styles.css">
+</head>
+<body>
+<header class="top-nav">
+  <div class="container nav-inner">
+    <a class="brand" href="/">QRventure Intramuros</a>
+    <nav class="nav-links">
+      <a href="/qrventure/attractions">Attractions</a><a href="/qrventure/dining">Dining</a><a href="/qrventure/routes">Routes</a>
+    </nav>
+  </div>
+</header>
+<main class="container">
+  <section class="hero section">
+    <div class="hero-eyebrow">Food & Rest</div>
+    <h1>Dining in and around the Walled City</h1>
+    <p>Filter places by dining type and discover curated cafés and restaurants for your itinerary breaks.</p>
+    <form class="search-row" method="get">
+      <input class="input" name="type" placeholder="Filter by cuisine or dining type">
+      <input class="input" value="Recommended near key landmarks" disabled>
+      <button class="btn btn-primary">Apply</button>
+    </form>
+  </section>
+  <section class="section"><div id="items"></div></section>
+</main>
+<footer class="footer"><div class="container">Pair dining stops with nearby routes for a smoother visit.</div></footer>
+<script src="/qrventure/js/api.js"></script><script src="/qrventure/js/listing.js"></script>
+<script>loadListing({target:'#items',endpoint:'/api/dining',type:'dining',empty:'No dining places found.',filters:[{url:'type',api:'type'}]})</script>
+</body>
+</html>

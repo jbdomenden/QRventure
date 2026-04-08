@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Walking Routes | QRventure Intramuros</title>
+  <link rel="stylesheet" href="/qrventure/css/styles.css">
+</head>
+<body>
+<header class="top-nav">
+  <div class="container nav-inner">
+    <a class="brand" href="/">QRventure Intramuros</a>
+    <nav class="nav-links">
+      <a href="/qrventure/attractions">Attractions</a><a href="/qrventure/dining">Dining</a><a href="/qrventure/services">Services</a><a href="/qrventure/routes">Routes</a>
+    </nav>
+  </div>
+</header>
+<main class="container">
+  <section class="hero section">
+    <div class="hero-eyebrow">Curated Walks</div>
+    <h1>Suggested Intramuros routes</h1>
+    <p>Choose routes based on available time, walking pace, and preferred landmarks from the heritage core.</p>
+    <form class="search-row" method="get">
+      <input class="input" name="q" placeholder="Search route by theme or stop">
+      <input class="input" value="Examples: Fort route, church route" disabled>
+      <button class="btn btn-primary">Apply</button>
+    </form>
+  </section>
+  <section class="section"><div id="items"></div></section>
+</main>
+<footer class="footer"><div class="container">Follow posted signs and local traffic guidance while walking.</div></footer>
+<script src="/qrventure/js/api.js"></script><script src="/qrventure/js/listing.js"></script>
+<script>loadListing({target:'#items',endpoint:'/api/routes',type:'routes',empty:'No routes found for this search.',filters:[{url:'q',api:'q'}]})</script>
+</body>
+</html>

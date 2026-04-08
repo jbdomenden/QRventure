@@ -1,4 +1,35 @@
-<!doctype html><html><head><meta charset='UTF-8'><meta name='viewport' content='width=device-width, initial-scale=1'><title>Services</title><link rel='stylesheet' href='/qrventure/css/styles.css'></head><body><header class='top-nav'><div class='container nav-inner'><a class='brand' href='/qrventure'>QRventure</a></div></header>
-<main class='container section'><h1>Local Tourist Services</h1><form class='search-row' method='get'><input class='input' name='type' placeholder='Filter by service type'><button class='btn btn-primary'>Apply</button></form><div id='items'></div></main>
-<script src='/qrventure/js/api.js'></script><script src='/qrventure/js/listing.js'></script><script>loadListing({target:'#items',endpoint:'/api/services',type:'services',empty:'No services found.',filters:[{url:'type',api:'type'}]})</script>
-</body></html>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Visitor Services | QRventure</title>
+  <link rel="stylesheet" href="/qrventure/css/styles.css">
+</head>
+<body>
+<header class="top-nav">
+  <div class="container nav-inner">
+    <a class="brand" href="/">QRventure Intramuros</a>
+    <nav class="nav-links">
+      <a href="/qrventure/attractions">Attractions</a><a href="/qrventure/services">Services</a><a href="/qrventure/routes">Routes</a>
+    </nav>
+  </div>
+</header>
+<main class="container">
+  <section class="hero section">
+    <div class="hero-eyebrow">Practical Help</div>
+    <h1>Essential visitor services</h1>
+    <p>Find ATMs, information desks, restrooms, and emergency-oriented facilities while you explore Intramuros.</p>
+    <form class="search-row" method="get">
+      <input class="input" name="type" placeholder="Filter by service type">
+      <input class="input" value="Updated from CMS records" disabled>
+      <button class="btn btn-primary">Apply</button>
+    </form>
+  </section>
+  <section class="section"><div id="items"></div></section>
+</main>
+<footer class="footer"><div class="container">Visitor services are shown with location and contact context.</div></footer>
+<script src="/qrventure/js/api.js"></script><script src="/qrventure/js/listing.js"></script>
+<script>loadListing({target:'#items',endpoint:'/api/services',type:'services',empty:'No services found.',filters:[{url:'type',api:'type'}]})</script>
+</body>
+</html>
