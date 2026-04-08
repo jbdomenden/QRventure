@@ -21,9 +21,9 @@ fun Application.configurePublicApiRoutes(connection: Connection?) {
             val service = TourismService(connection)
             get("/featured") { call.respond(service.featured()) }
             get("/attractions") { call.respond(service.attractions(call.request.queryParameters["q"], call.request.queryParameters["category"])) }
-            get("/attractions/{key}") {
-                val key = call.parameters["key"] ?: return@get call.respond(HttpStatusCode.BadRequest, ErrorResponse("Missing attraction key"))
-                val item = service.attractionBySlugOrId(key)
+            get("/attractions/{idOrSlug}") {
+                val idOrSlug = call.parameters["idOrSlug"] ?: return@get call.respond(HttpStatusCode.BadRequest, ErrorResponse("Missing attraction key"))
+                val item = service.attractionBySlugOrId(idOrSlug)
                 if (item == null) call.respond(HttpStatusCode.NotFound, ErrorResponse("Attraction not found")) else call.respond(item)
             }
             get("/dining") { call.respond(service.dining(call.request.queryParameters["type"])) }
@@ -43,6 +43,7 @@ fun Application.configurePublicApiRoutes(connection: Connection?) {
                 if (query.length < 2) return@get call.respond(HttpStatusCode.BadRequest, ErrorResponse("Query must be at least 2 characters"))
                 call.respond(service.search(query))
             }
+            get("/routes") { call.respond(service.tourRoutes(call.request.queryParameters["q"])) }
         }
     }
 }

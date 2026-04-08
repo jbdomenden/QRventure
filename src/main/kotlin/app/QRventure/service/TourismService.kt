@@ -18,8 +18,8 @@ class TourismService(private val connection: Connection) {
         return SearchResponse(
             query = q,
             attractions = attractions(search = q),
-            dining = dining(type = q),
-            services = services(type = q)
+            dining = dining(search = q),
+            services = services(search = q)
         )
     }
 
@@ -97,14 +97,28 @@ class TourismService(private val connection: Connection) {
 
     fun deleteAttraction(key: String): Boolean = connection.deleteByKey("attractions", key)
 
-    fun dining(type: String? = null): List<DiningPlace> {
+    fun dining(type: String? = null, search: String? = null): List<DiningPlace> {
         val sql = buildString {
             append("SELECT * FROM dining_places")
-            if (!type.isNullOrBlank()) append(" WHERE LOWER(cuisine_or_type) LIKE ?")
+            val hasType = !type.isNullOrBlank()
+            val hasSearch = !search.isNullOrBlank()
+            if (hasType || hasSearch) {
+                append(" WHERE ")
+                if (hasType) append("LOWER(cuisine_or_type) LIKE ?")
+                if (hasSearch) {
+                    if (hasType) append(" AND ")
+                    append("(LOWER(name) LIKE ? OR LOWER(description) LIKE ? OR LOWER(cuisine_or_type) LIKE ? OR LOWER(location_text) LIKE ?)")
+                }
+            }
             append(" ORDER BY is_featured DESC, name ASC")
         }
         return connection.prepareStatement(sql).use { ps ->
-            if (!type.isNullOrBlank()) ps.setString(1, "%${type.lowercase()}%")
+            var i = 1
+            if (!type.isNullOrBlank()) ps.setString(i++, "%${type.lowercase()}%")
+            if (!search.isNullOrBlank()) {
+                val searchValue = "%${search.lowercase()}%"
+                repeat(4) { ps.setString(i++, searchValue) }
+            }
             ps.executeQuery().toList { it.toDining() }
         }
     }
@@ -154,14 +168,28 @@ class TourismService(private val connection: Connection) {
 
     fun deleteDining(key: String): Boolean = connection.deleteByKey("dining_places", key)
 
-    fun services(type: String? = null): List<LocalService> {
+    fun services(type: String? = null, search: String? = null): List<LocalService> {
         val sql = buildString {
             append("SELECT * FROM local_services")
-            if (!type.isNullOrBlank()) append(" WHERE LOWER(service_type) LIKE ?")
+            val hasType = !type.isNullOrBlank()
+            val hasSearch = !search.isNullOrBlank()
+            if (hasType || hasSearch) {
+                append(" WHERE ")
+                if (hasType) append("LOWER(service_type) LIKE ?")
+                if (hasSearch) {
+                    if (hasType) append(" AND ")
+                    append("(LOWER(name) LIKE ? OR LOWER(description) LIKE ? OR LOWER(service_type) LIKE ? OR LOWER(location_text) LIKE ? OR LOWER(travel_tips) LIKE ?)")
+                }
+            }
             append(" ORDER BY is_featured DESC, name ASC")
         }
         return connection.prepareStatement(sql).use { ps ->
-            if (!type.isNullOrBlank()) ps.setString(1, "%${type.lowercase()}%")
+            var i = 1
+            if (!type.isNullOrBlank()) ps.setString(i++, "%${type.lowercase()}%")
+            if (!search.isNullOrBlank()) {
+                val searchValue = "%${search.lowercase()}%"
+                repeat(5) { ps.setString(i++, searchValue) }
+            }
             ps.executeQuery().toList { it.toService() }
         }
     }
