@@ -6,9 +6,25 @@
   <title>QRventure Admin CMS</title>
   <link rel="stylesheet" href="/qrventure/css/styles.css" />
   <style>
-    .admin-shell { padding: var(--s20) 0 var(--s30); }
-    .admin-header { display: flex; align-items: center; justify-content: space-between; gap: var(--s12); margin-bottom: var(--s16); }
+    .admin-shell { padding: var(--space-5) 0 var(--space-6); display: grid; gap: var(--space-3); }
+    .admin-header { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); flex-wrap: wrap; }
     .admin-title { margin: 0; }
+    .admin-layout { display: grid; gap: var(--space-3); }
+    .admin-toolbar { display: grid; gap: var(--space-2); grid-template-columns: 1fr; }
+    .admin-actions { display: flex; flex-wrap: wrap; gap: var(--space-2); }
+    .admin-grid { display: grid; gap: var(--space-3); grid-template-columns: 1fr; }
+    .admin-list { display: grid; gap: var(--space-2); }
+    .admin-item { border: 1px solid var(--line); border-radius: var(--radius-sm); padding: var(--space-3); background: #fffdf9; }
+    .admin-item p { margin: 0; }
+    .form-grid { display: grid; gap: var(--space-2); }
+    .field { display: grid; gap: 4px; }
+    .field textarea { min-height: 90px; resize: vertical; }
+    .state-inline { margin-top: var(--space-2); }
+    .upload-row { display: flex; flex-wrap: wrap; gap: var(--space-2); align-items: center; }
+    @media (min-width: 900px) {
+      .admin-grid { grid-template-columns: 1fr 1.1fr; }
+      .admin-toolbar { grid-template-columns: 220px 1fr; align-items: center; }
+    }
   </style>
 </head>
 <body>
@@ -25,31 +41,52 @@
       <h2>Session Status</h2>
       <p id="adminStatus" class="meta">Checking your admin session…</p>
     </section>
+
+    <section class="card admin-layout">
+      <div class="admin-toolbar">
+        <label>
+          Content type
+          <select id="entitySelect" class="select">
+            <option value="attractions">Attractions</option>
+            <option value="dining">Dining</option>
+            <option value="services">Services</option>
+            <option value="routes">Routes</option>
+          </select>
+        </label>
+        <label>
+          Search
+          <input id="searchInput" class="input" placeholder="Search by name and related details" />
+        </label>
+      </div>
+      <div class="admin-actions">
+        <button id="refreshBtn" class="btn btn-secondary" type="button">Refresh list</button>
+        <button id="createBtn" class="btn btn-primary" type="button">New entry</button>
+      </div>
+      <div id="listState"></div>
+      <div class="admin-grid">
+        <section>
+          <h3>Records</h3>
+          <div id="records" class="admin-list"></div>
+        </section>
+        <section>
+          <h3 id="editorTitle">Create entry</h3>
+          <form id="editorForm" class="form-grid"></form>
+          <div class="upload-row">
+            <input id="fileInput" type="file" accept="image/jpeg,image/png,image/webp" />
+            <button id="uploadBtn" class="btn btn-secondary" type="button">Upload image</button>
+          </div>
+          <p class="meta">Uploaded path will be applied to the imagePath field in the current form.</p>
+          <div class="admin-actions">
+            <button id="saveBtn" class="btn btn-primary" type="submit" form="editorForm">Save</button>
+            <button id="deleteBtn" class="btn btn-secondary" type="button" disabled>Delete selected</button>
+            <button id="cancelBtn" class="btn btn-secondary" type="button">Cancel edit</button>
+          </div>
+          <div id="formState" class="state-inline"></div>
+        </section>
+      </div>
+    </section>
   </main>
 
-  <script>
-    const adminStatus = document.getElementById('adminStatus');
-    const logoutBtn = document.getElementById('logoutBtn');
-
-    const loadSession = async () => {
-      const response = await fetch('/api/admin/me');
-      if (!response.ok) {
-        window.location.href = '/admin/login';
-        return;
-      }
-
-      const body = await response.json();
-      adminStatus.textContent = `Signed in as ${body.username}.`;
-    };
-
-    logoutBtn.addEventListener('click', async () => {
-      await fetch('/api/admin/logout', { method: 'POST' });
-      window.location.href = '/admin/login';
-    });
-
-    loadSession().catch(() => {
-      window.location.href = '/admin/login';
-    });
-  </script>
+  <script type="module" src="/qrventure/js/admin-cms.js"></script>
 </body>
 </html>
