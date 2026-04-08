@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Login | QRventure</title>
+  <link rel="stylesheet" href="/qrventure/css/styles.css" />
+  <style>
+    .auth-wrap { min-height: 100vh; display: grid; place-items: center; padding: 24px 0; }
+    .auth-card { width: min(460px, 100%); background: var(--ivory); border: 1px solid var(--border-cream); border-radius: var(--r16); padding: var(--s20); box-shadow: 0 8px 24px rgba(20,20,19,.06); }
+    .auth-card h1 { margin-top: 0; margin-bottom: var(--s8); font-family: Georgia, "Times New Roman", serif; }
+    .auth-form { display: grid; gap: var(--s12); margin-top: var(--s16); }
+    .auth-feedback { min-height: 24px; font-size: .95rem; color: var(--error); }
+    .auth-meta { color: var(--stone-gray); }
+  </style>
+</head>
+<body>
+  <main class="container auth-wrap">
+    <section class="auth-card">
+      <h1>QRventure Admin</h1>
+      <p class="auth-meta">Sign in to manage Intramuros tourism content.</p>
+
+      <form id="loginForm" class="auth-form">
+        <label>
+          Username
+          <input class="input" id="username" name="username" autocomplete="username" required />
+        </label>
+        <label>
+          Password
+          <input class="input" id="password" name="password" type="password" autocomplete="current-password" required />
+        </label>
+        <button class="btn btn-primary" type="submit">Log in</button>
+      </form>
+      <p class="auth-feedback" id="feedback" role="status" aria-live="polite"></p>
+    </section>
+  </main>
+
+  <script>
+    const loginForm = document.getElementById('loginForm');
+    const feedback = document.getElementById('feedback');
+
+    loginForm.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      feedback.textContent = '';
+
+      const payload = {
+        username: document.getElementById('username').value.trim(),
+        password: document.getElementById('password').value
+      };
+
+      try {
+        const response = await fetch('/api/admin/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        const body = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(body.message || 'Login failed.');
+
+        window.location.href = '/admin';
+      } catch (error) {
+        feedback.textContent = error.message || 'Unable to sign in right now.';
+      }
+    });
+  </script>
+</body>
+</html>

@@ -3,13 +3,53 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>QRventure Admin</title>
+  <title>QRventure Admin CMS</title>
   <link rel="stylesheet" href="/qrventure/css/styles.css" />
+  <style>
+    .admin-shell { padding: var(--s20) 0 var(--s30); }
+    .admin-header { display: flex; align-items: center; justify-content: space-between; gap: var(--s12); margin-bottom: var(--s16); }
+    .admin-title { margin: 0; }
+  </style>
 </head>
 <body>
-  <main class="container section">
-    <h1>QRventure Admin CMS (Phase 1 Scaffold)</h1>
-    <p class="meta">Admin features will be implemented in later phases.</p>
+  <main class="container admin-shell">
+    <header class="admin-header">
+      <div>
+        <h1 class="admin-title">QRventure Admin CMS</h1>
+        <p class="meta">Curate landmarks, walking routes, and visitor updates for Intramuros.</p>
+      </div>
+      <button class="btn btn-secondary" id="logoutBtn" type="button">Log out</button>
+    </header>
+
+    <section class="card">
+      <h2>Session Status</h2>
+      <p id="adminStatus" class="meta">Checking your admin session…</p>
+    </section>
   </main>
+
+  <script>
+    const adminStatus = document.getElementById('adminStatus');
+    const logoutBtn = document.getElementById('logoutBtn');
+
+    const loadSession = async () => {
+      const response = await fetch('/api/admin/me');
+      if (!response.ok) {
+        window.location.href = '/admin/login';
+        return;
+      }
+
+      const body = await response.json();
+      adminStatus.textContent = `Signed in as ${body.username}.`;
+    };
+
+    logoutBtn.addEventListener('click', async () => {
+      await fetch('/api/admin/logout', { method: 'POST' });
+      window.location.href = '/admin/login';
+    });
+
+    loadSession().catch(() => {
+      window.location.href = '/admin/login';
+    });
+  </script>
 </body>
 </html>

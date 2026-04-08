@@ -27,6 +27,7 @@ dependencies {
     implementation("com.ucasoft.ktor:ktor-simple-memory-cache:0.59.4")
     implementation("io.ktor:ktor-server-auth")
     implementation("io.ktor:ktor-server-auth-jwt")
+    implementation("io.ktor:ktor-server-sessions")
     implementation("io.ktor:ktor-server-host-common")
     implementation("io.ktor:ktor-server-content-negotiation")
     implementation("io.ktor:ktor-serialization-kotlinx-json")
