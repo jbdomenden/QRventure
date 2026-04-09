@@ -29,7 +29,11 @@ fun Application.configureAdminAuth() {
             cookie.httpOnly = true
             cookie.secure = false
             cookie.extensions["SameSite"] = "lax"
+<<<<<<< codex/finalize-system-for-tourism-website-ghjfai
             cookie.maxAge = 12.hours
+=======
+            cookie.maxAge = 60 * 60 * 12
+>>>>>>> main
         }
     }
 }
