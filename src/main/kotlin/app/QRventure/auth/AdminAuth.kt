@@ -6,6 +6,7 @@ import java.security.MessageDigest
 import java.util.Base64
 import javax.crypto.SecretKeyFactory
 import javax.crypto.spec.PBEKeySpec
+import kotlin.time.Duration.Companion.hours
 
 data class AdminSession(val username: String)
 
@@ -28,7 +29,7 @@ fun Application.configureAdminAuth() {
             cookie.httpOnly = true
             cookie.secure = false
             cookie.extensions["SameSite"] = "lax"
-            maxAgeInSeconds = 60 * 60 * 12
+            cookie.maxAge = 12.hours
         }
     }
 }
