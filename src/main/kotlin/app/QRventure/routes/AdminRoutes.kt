@@ -7,6 +7,8 @@ import app.QRventure.auth.verifyPassword
 import app.QRventure.dto.*
 import app.QRventure.service.TourismService
 import io.ktor.http.*
+import io.ktor.http.content.PartData
+import io.ktor.http.content.forEachPart
 import io.ktor.server.application.*
 import io.ktor.server.http.content.*
 import io.ktor.server.request.*
@@ -99,17 +101,25 @@ fun Application.configureAdminRoutes(connection: java.sql.Connection?) {
 
                     val multipart = call.receiveMultipart()
                     var uploadResult: String? = null
+                    var uploadError: String? = null
 
                     multipart.forEachPart { part ->
                         if (part is PartData.FileItem && part.name == "file") {
                             val saved = saveUpload(part)
                             if (saved.isFailure) {
-                                part.dispose()
-                                return@post call.respond(HttpStatusCode.BadRequest, ErrorResponse(saved.exceptionOrNull()?.message ?: "Invalid file upload."))
+                                uploadError = saved.exceptionOrNull()?.message ?: "Invalid file upload."
                             }
-                            uploadResult = saved.getOrNull()
+                            if (uploadError == null) {
+                                uploadResult = saved.getOrNull()
+                            }
                         }
                         part.dispose()
+                    }
+
+                    val uploadErrorMessage = uploadError
+                    if (uploadErrorMessage != null) {
+                        call.respond(HttpStatusCode.BadRequest, ErrorResponse(uploadErrorMessage))
+                        return@post
                     }
 
                     val path = uploadResult
@@ -263,8 +273,8 @@ fun Application.configureAdminRoutes(connection: java.sql.Connection?) {
 }
 
 private suspend inline fun <reified T> ApplicationCall.parseBody(): T? =
-    runCatching { receive<T>() }.getOrElse {
-        respond(HttpStatusCode.BadRequest, ErrorResponse("Invalid request body."))
+    runCatching { this.receive<T>() }.getOrElse {
+        this.respond(HttpStatusCode.BadRequest, ErrorResponse("Invalid request body."))
         null
     }
 
