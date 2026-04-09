@@ -28,7 +28,7 @@ fun Application.configureAdminAuth() {
             cookie.httpOnly = true
             cookie.secure = false
             cookie.extensions["SameSite"] = "lax"
-            maxAgeInSeconds = 60 * 60 * 12
+            cookie.maxAge = 60 * 60 * 12
         }
     }
 }
