@@ -2,8 +2,8 @@
   --bg-page: #f4efe4;
   --bg-surface: #fbf7ef;
   --bg-surface-2: #f8f1e4;
-  --ink-main: #26221e;
-  --ink-soft: #5f564d;
+  --ink-main: #1f1b18;
+  --ink-soft: #4e463f;
   --accent: #b05f42;
   --accent-deep: #8f472f;
   --line: #ddd0bb;
@@ -25,10 +25,25 @@
 body {
   margin: 0;
   font-family: "Inter", "Segoe UI", Arial, sans-serif;
-  background: var(--bg-page);
+  position: relative;
+  background-image: url("https://cdn.theculturetrip.com/wp-content/uploads/2018/06/291298_268823886550436_1199151680_o.jpg");
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  min-height: 100vh;
   color: var(--ink-main);
   line-height: 1.55;
 }
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: rgba(245, 240, 230, 0.82);
+  z-index: 0;
+  pointer-events: none;
+}
+body > * { position: relative; z-index: 1; }
 a { color: inherit; text-decoration: none; }
 img { max-width: 100%; display: block; }
 
@@ -36,6 +51,8 @@ h1, h2, h3, h4 {
   font-family: "Iowan Old Style", "Palatino Linotype", Georgia, serif;
   line-height: 1.2;
   letter-spacing: .01em;
+  color: #1b1613;
+  font-weight: 700;
 }
 
 .container {
@@ -50,6 +67,49 @@ h1, h2, h3, h4 {
   background: rgba(251, 247, 239, .96);
   backdrop-filter: blur(6px);
   border-bottom: 1px solid var(--line);
+}
+
+.public-header {
+  position: sticky;
+  top: 0;
+  z-index: 35;
+  background: rgba(251, 247, 239, .96);
+  backdrop-filter: blur(6px);
+  border-bottom: 1px solid var(--line);
+}
+
+.public-header-inner {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: var(--space-2);
+  align-items: center;
+  padding: var(--space-3) 0;
+}
+
+.public-back-button {
+  border: 1px solid var(--line-strong);
+  background: var(--bg-surface-2);
+  color: var(--accent-deep);
+  border-radius: 999px;
+  font: inherit;
+  padding: 8px 12px;
+  cursor: pointer;
+}
+
+.public-header-title {
+  font-family: "Iowan Old Style", Georgia, serif;
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.public-header-actions { grid-column: 1 / -1; }
+.public-header-links { display: flex; flex-wrap: wrap; gap: 8px; }
+.public-header-links a {
+  border: 1px solid var(--line);
+  background: var(--bg-surface-2);
+  border-radius: 999px;
+  padding: 7px 12px;
+  font-size: .9rem;
 }
 
 .nav-inner {
@@ -84,6 +144,13 @@ main { padding-bottom: var(--space-6); }
 
 .hero {
   padding: var(--space-6) 0 var(--space-5);
+  background: linear-gradient(
+    180deg,
+    rgba(250, 247, 240, 0.92) 0%,
+    rgba(245, 240, 230, 0.88) 55%,
+    rgba(239, 232, 220, 0.84) 100%
+  );
+  border-radius: var(--radius-lg);
 }
 
 .hero-eyebrow {
@@ -107,6 +174,13 @@ main { padding-bottom: var(--space-6); }
 
 .section {
   padding: var(--space-5) 0;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 250, 242, 0.94) 0%,
+    rgba(246, 239, 229, 0.90) 60%,
+    rgba(234, 226, 214, 0.86) 100%
+  );
+  border-radius: var(--radius-lg);
 }
 
 .section-header {
@@ -124,8 +198,8 @@ main { padding-bottom: var(--space-6); }
 .grid.cards { grid-template-columns: 1fr; }
 
 .card {
-  background: var(--bg-surface);
-  border: 1px solid var(--line);
+  background: rgba(250, 247, 240, 0.94);
+  border: 1px solid rgba(150, 125, 95, 0.20);
   border-radius: var(--radius-md);
   padding: var(--space-4);
   box-shadow: 0 2px 8px rgba(76, 57, 36, .05);
@@ -133,20 +207,30 @@ main { padding-bottom: var(--space-6); }
 
 .card.visual-card { padding: 0; overflow: hidden; }
 .card-visual-body { padding: var(--space-4); }
+.card-image-empty {
+  min-height: 200px;
+  max-height: 220px;
+  display: grid;
+  place-items: center;
+  color: var(--ink-soft);
+  background: #f4ecdd;
+  border-bottom: 1px solid var(--line);
+}
 
 .card img {
   width: 100%;
-  aspect-ratio: 16 / 9;
+  height: 100%;
   object-fit: cover;
   border-bottom: 1px solid var(--line);
   background: #eadfcb;
 }
+.card.visual-card > img { min-height: 200px; max-height: 220px; }
 
 .card h3 { margin: 0 0 var(--space-1); font-size: 1.2rem; }
 .card p { margin: 0 0 var(--space-2); color: var(--ink-soft); }
 
 .meta {
-  color: var(--ink-soft);
+  color: #665d55;
   font-size: .9rem;
   margin-bottom: var(--space-2);
 }
@@ -163,7 +247,7 @@ main { padding-bottom: var(--space-6); }
   cursor: pointer;
 }
 
-.btn-primary { background: var(--accent); color: #fff7f0; }
+.btn-primary { background: var(--accent); color: #fffaf4; }
 .btn-primary:hover { background: var(--accent-deep); }
 .btn-secondary { border-color: var(--line-strong); color: var(--accent-deep); background: transparent; }
 
@@ -229,7 +313,68 @@ main { padding-bottom: var(--space-6); }
 
 .detail-layout { display: grid; gap: var(--space-3); }
 
+.detail-gallery { margin: calc(-1 * var(--space-4)) calc(-1 * var(--space-4)) var(--space-4); }
+.detail-gallery-main { position: relative; background: #eadfcb; }
+.detail-gallery-main img {
+  width: 100%;
+  height: 100%;
+  min-height: 240px;
+  object-fit: cover;
+  border-bottom: 1px solid var(--line);
+}
+.detail-image-empty {
+  min-height: 240px;
+  display: grid;
+  place-items: center;
+  color: var(--ink-soft);
+  background: #f4ecdd;
+  border-bottom: 1px solid var(--line);
+}
+.gallery-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 34px;
+  height: 34px;
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  background: rgba(251, 247, 239, .9);
+  color: var(--accent-deep);
+  cursor: pointer;
+}
+.gallery-nav.prev { left: 10px; }
+.gallery-nav.next { right: 10px; }
+.detail-thumbs {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+  gap: 8px;
+  padding: var(--space-2);
+}
+.detail-thumb {
+  padding: 0;
+  border: 2px solid transparent;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  background: #eadfcb;
+  cursor: pointer;
+}
+.detail-thumb.active { border-color: var(--accent); }
+.detail-thumb img {
+  width: 100%;
+  height: 100%;
+  min-height: 58px;
+  object-fit: cover;
+}
+.detail-no-image {
+  border-bottom: 1px solid var(--line);
+  background: #f4ecdd;
+  padding: var(--space-5);
+  color: var(--ink-soft);
+}
+
 @media (min-width: 720px) {
+  .public-header-inner { grid-template-columns: auto auto 1fr; }
+  .public-header-actions { grid-column: auto; justify-self: end; }
   .nav-inner { flex-direction: row; align-items: center; justify-content: space-between; }
   .grid.cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .search-row { grid-template-columns: 1fr 200px 140px; }

@@ -10,9 +10,3 @@ postgres:
   user: "postgres"
   password: "root"
   required: true
-
-adminAuth:
-  username: "admin"
-  passwordHash: "uuwgBkpbBLDkauDW88ClZxZDarRvu9hsHzJUJCGI2VY="
-  passwordSalt: "7FEZnOhXPhFJr4JKFEtqQQ=="
-  iterations: 120000
