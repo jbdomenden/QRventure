@@ -120,10 +120,14 @@ object DatabaseFactory {
             st.execute("ALTER TABLE dining_places ADD COLUMN IF NOT EXISTS visitor_notes TEXT NOT NULL DEFAULT ''")
             st.execute("ALTER TABLE dining_places ADD COLUMN IF NOT EXISTS status VARCHAR(30) NOT NULL DEFAULT 'open'")
             st.execute("ALTER TABLE dining_places ADD COLUMN IF NOT EXISTS sort_order INT NOT NULL DEFAULT 0")
-            st.execute("UPDATE dining_places SET short_description = COALESCE(NULLIF(short_description,''), description)")
-            st.execute("UPDATE dining_places SET full_description = COALESCE(NULLIF(full_description,''), description)")
-            st.execute("UPDATE dining_places SET dining_type = COALESCE(NULLIF(dining_type,''), cuisine_or_type)")
-            st.execute("UPDATE dining_places SET cuisine = COALESCE(NULLIF(cuisine,''), cuisine_or_type)")
+            if (columnExists(connection, "dining_places", "description")) {
+                st.execute("UPDATE dining_places SET short_description = COALESCE(NULLIF(short_description,''), description)")
+                st.execute("UPDATE dining_places SET full_description = COALESCE(NULLIF(full_description,''), description)")
+            }
+            if (columnExists(connection, "dining_places", "cuisine_or_type")) {
+                st.execute("UPDATE dining_places SET dining_type = COALESCE(NULLIF(dining_type,''), cuisine_or_type)")
+                st.execute("UPDATE dining_places SET cuisine = COALESCE(NULLIF(cuisine,''), cuisine_or_type)")
+            }
 
             st.execute("ALTER TABLE local_services ADD COLUMN IF NOT EXISTS short_description TEXT NOT NULL DEFAULT ''")
             st.execute("ALTER TABLE local_services ADD COLUMN IF NOT EXISTS full_description TEXT NOT NULL DEFAULT ''")
@@ -131,10 +135,16 @@ object DatabaseFactory {
             st.execute("ALTER TABLE local_services ADD COLUMN IF NOT EXISTS visitor_notes TEXT NOT NULL DEFAULT ''")
             st.execute("ALTER TABLE local_services ADD COLUMN IF NOT EXISTS status VARCHAR(30) NOT NULL DEFAULT 'open'")
             st.execute("ALTER TABLE local_services ADD COLUMN IF NOT EXISTS sort_order INT NOT NULL DEFAULT 0")
-            st.execute("UPDATE local_services SET short_description = COALESCE(NULLIF(short_description,''), description)")
-            st.execute("UPDATE local_services SET full_description = COALESCE(NULLIF(full_description,''), description)")
-            st.execute("UPDATE local_services SET hours = COALESCE(NULLIF(hours,''), operating_hours)")
-            st.execute("UPDATE local_services SET visitor_notes = COALESCE(NULLIF(visitor_notes,''), travel_tips)")
+            if (columnExists(connection, "local_services", "description")) {
+                st.execute("UPDATE local_services SET short_description = COALESCE(NULLIF(short_description,''), description)")
+                st.execute("UPDATE local_services SET full_description = COALESCE(NULLIF(full_description,''), description)")
+            }
+            if (columnExists(connection, "local_services", "operating_hours")) {
+                st.execute("UPDATE local_services SET hours = COALESCE(NULLIF(hours,''), operating_hours)")
+            }
+            if (columnExists(connection, "local_services", "travel_tips")) {
+                st.execute("UPDATE local_services SET visitor_notes = COALESCE(NULLIF(visitor_notes,''), travel_tips)")
+            }
 
             st.execute("ALTER TABLE tour_routes ADD COLUMN IF NOT EXISTS short_description TEXT NOT NULL DEFAULT ''")
             st.execute("ALTER TABLE tour_routes ADD COLUMN IF NOT EXISTS full_description TEXT NOT NULL DEFAULT ''")
@@ -146,16 +156,25 @@ object DatabaseFactory {
             st.execute("ALTER TABLE tour_routes ADD COLUMN IF NOT EXISTS map_link TEXT NOT NULL DEFAULT ''")
             st.execute("ALTER TABLE tour_routes ADD COLUMN IF NOT EXISTS status VARCHAR(30) NOT NULL DEFAULT 'open'")
             st.execute("ALTER TABLE tour_routes ADD COLUMN IF NOT EXISTS sort_order INT NOT NULL DEFAULT 0")
-            st.execute("UPDATE tour_routes SET full_description = COALESCE(NULLIF(full_description,''), route_description)")
-            st.execute("UPDATE tour_routes SET short_description = COALESCE(NULLIF(short_description,''), SUBSTRING(route_description FROM 1 FOR 150))")
-            st.execute("UPDATE tour_routes SET starting_point = COALESCE(NULLIF(starting_point,''), start_point)")
-            st.execute("UPDATE tour_routes SET estimated_duration = COALESCE(NULLIF(estimated_duration,''), duration_text)")
-            st.execute("UPDATE tour_routes SET distance_text = COALESCE(NULLIF(distance_text,''), CONCAT(distance_km, ' km'))")
-            st.execute("UPDATE tour_routes SET travel_tips = COALESCE(NULLIF(travel_tips,''), highlights)")
+            if (columnExists(connection, "tour_routes", "route_description")) {
+                st.execute("UPDATE tour_routes SET full_description = COALESCE(NULLIF(full_description,''), route_description)")
+                st.execute("UPDATE tour_routes SET short_description = COALESCE(NULLIF(short_description,''), SUBSTRING(route_description FROM 1 FOR 150))")
+            }
+            if (columnExists(connection, "tour_routes", "start_point")) {
+                st.execute("UPDATE tour_routes SET starting_point = COALESCE(NULLIF(starting_point,''), start_point)")
+            }
+            if (columnExists(connection, "tour_routes", "duration_text")) {
+                st.execute("UPDATE tour_routes SET estimated_duration = COALESCE(NULLIF(estimated_duration,''), duration_text)")
+            }
+            if (columnExists(connection, "tour_routes", "distance_km")) {
+                st.execute("UPDATE tour_routes SET distance_text = COALESCE(NULLIF(distance_text,''), CONCAT(distance_km, ' km'))")
+            }
+            if (columnExists(connection, "tour_routes", "highlights")) {
+                st.execute("UPDATE tour_routes SET travel_tips = COALESCE(NULLIF(travel_tips,''), highlights)")
+            }
 
             st.execute("CREATE TABLE IF NOT EXISTS admins (id SERIAL PRIMARY KEY, email VARCHAR(180) UNIQUE NOT NULL, password_hash VARCHAR(255) NOT NULL, role VARCHAR(40) NOT NULL DEFAULT 'super_admin', created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP)")
         }
-    }
 
     fun seedData(connection: Connection) {
         if (!tableHasData(connection, "admins")) {
@@ -215,3 +234,7 @@ object DatabaseFactory {
     private fun tableHasData(connection: Connection, table: String): Boolean =
         connection.createStatement().use { st -> st.executeQuery("SELECT COUNT(*) FROM $table").let { it.next(); it.getInt(1) > 0 } }
 }
+
+
+private fun columnExists(connection: Connection, table: String, column: String): Boolean =
+    connection.metaData.getColumns(null, null, table, column).use { it.next() }
