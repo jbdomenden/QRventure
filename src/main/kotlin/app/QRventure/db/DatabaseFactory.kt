@@ -234,8 +234,7 @@ object DatabaseFactory {
     private fun tableHasData(connection: Connection, table: String): Boolean {
         connection.createStatement().use { st ->
             st.executeQuery("SELECT COUNT(*) FROM $table").use { rs ->
-                rs.next()
-                return rs.getInt(1) > 0
+                return if (rs.next()) rs.getInt(1) > 0 else false
             }
         }
     }
