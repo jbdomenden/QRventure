@@ -1,286 +1,249 @@
 package app.QRventure.db
 
 import io.ktor.server.config.*
-import java.security.MessageDigest
 import java.sql.Connection
 import java.sql.DriverManager
-import java.util.Base64
 
 object DatabaseFactory {
     fun connect(config: ApplicationConfig): Connection {
         val url = config.property("postgres.url").getString()
         if (url.startsWith("jdbc:h2:")) Class.forName("org.h2.Driver") else Class.forName("org.postgresql.Driver")
-        val user = config.property("postgres.user").getString()
-        val password = config.property("postgres.password").getString()
-        return DriverManager.getConnection(url, user, password)
+        return DriverManager.getConnection(url, config.property("postgres.user").getString(), config.property("postgres.password").getString())
     }
 
     fun initializeSchema(connection: Connection) {
-        connection.createStatement().use { statement ->
-            statement.execute(
-                """
-                CREATE TABLE IF NOT EXISTS admins (
-                  id SERIAL PRIMARY KEY,
-                  email VARCHAR(180) UNIQUE NOT NULL,
-                  password_hash VARCHAR(255) NOT NULL,
-                  role VARCHAR(40) NOT NULL DEFAULT 'super_admin',
-                  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
-                );
-                """.trimIndent()
-            )
-
-            statement.execute(
+        connection.createStatement().use { st ->
+            st.execute(
                 """
                 CREATE TABLE IF NOT EXISTS attractions (
-                  id SERIAL PRIMARY KEY,
-                  slug VARCHAR(120) UNIQUE NOT NULL,
-                  name VARCHAR(180) NOT NULL,
-                  short_description TEXT NOT NULL,
-                  full_description TEXT NOT NULL,
-                  category VARCHAR(80) NOT NULL,
-                  location_text VARCHAR(220) NOT NULL,
-                  opening_hours VARCHAR(150) NOT NULL,
-                  entrance_fee VARCHAR(120) NOT NULL,
-                  contact_details VARCHAR(180) NOT NULL,
-                  latitude DOUBLE PRECISION NOT NULL,
-                  longitude DOUBLE PRECISION NOT NULL,
-                  image_path VARCHAR(240) NOT NULL,
-                  status VARCHAR(30) NOT NULL,
-                  is_featured BOOLEAN NOT NULL DEFAULT FALSE
-                );
+                    id SERIAL PRIMARY KEY,
+                    slug VARCHAR(120) UNIQUE NOT NULL,
+                    name VARCHAR(180) NOT NULL,
+                    short_description TEXT NOT NULL,
+                    full_description TEXT NOT NULL,
+                    category VARCHAR(80) NOT NULL,
+                    historical_period VARCHAR(120) NOT NULL DEFAULT '',
+                    location_text VARCHAR(220) NOT NULL,
+                    opening_hours VARCHAR(150) NOT NULL,
+                    entrance_fee VARCHAR(120) NOT NULL,
+                    contact_details VARCHAR(180) NOT NULL,
+                    visitor_tips TEXT NOT NULL DEFAULT '',
+                    best_time_to_visit VARCHAR(120) NOT NULL DEFAULT '',
+                    latitude DOUBLE PRECISION NOT NULL,
+                    longitude DOUBLE PRECISION NOT NULL,
+                    image_path VARCHAR(240) NOT NULL,
+                    is_featured BOOLEAN NOT NULL DEFAULT FALSE,
+                    status VARCHAR(30) NOT NULL DEFAULT 'open',
+                    sort_order INT NOT NULL DEFAULT 0
+                )
                 """.trimIndent()
             )
 
-            statement.execute(
+            st.execute(
                 """
                 CREATE TABLE IF NOT EXISTS dining_places (
-                  id SERIAL PRIMARY KEY,
-                  slug VARCHAR(120) UNIQUE NOT NULL,
-                  name VARCHAR(180) NOT NULL,
-                  description TEXT NOT NULL,
-                  cuisine_or_type VARCHAR(100) NOT NULL,
-                  location_text VARCHAR(220) NOT NULL,
-                  opening_hours VARCHAR(150) NOT NULL,
-                  price_range VARCHAR(80) NOT NULL,
-                  contact_details VARCHAR(180) NOT NULL,
-                  latitude DOUBLE PRECISION NOT NULL,
-                  longitude DOUBLE PRECISION NOT NULL,
-                  image_path VARCHAR(240) NOT NULL,
-                  is_featured BOOLEAN NOT NULL DEFAULT FALSE
-                );
+                    id SERIAL PRIMARY KEY,
+                    slug VARCHAR(120) UNIQUE NOT NULL,
+                    name VARCHAR(180) NOT NULL,
+                    short_description TEXT NOT NULL DEFAULT '',
+                    full_description TEXT NOT NULL DEFAULT '',
+                    dining_type VARCHAR(100) NOT NULL DEFAULT '',
+                    cuisine VARCHAR(100) NOT NULL DEFAULT '',
+                    location_text VARCHAR(220) NOT NULL,
+                    opening_hours VARCHAR(150) NOT NULL,
+                    price_range VARCHAR(80) NOT NULL,
+                    contact_details VARCHAR(180) NOT NULL,
+                    visitor_notes TEXT NOT NULL DEFAULT '',
+                    latitude DOUBLE PRECISION NOT NULL,
+                    longitude DOUBLE PRECISION NOT NULL,
+                    image_path VARCHAR(240) NOT NULL,
+                    is_featured BOOLEAN NOT NULL DEFAULT FALSE,
+                    status VARCHAR(30) NOT NULL DEFAULT 'open',
+                    sort_order INT NOT NULL DEFAULT 0
+                )
                 """.trimIndent()
             )
 
-            statement.execute(
+            st.execute(
                 """
                 CREATE TABLE IF NOT EXISTS local_services (
-                  id SERIAL PRIMARY KEY,
-                  slug VARCHAR(120) UNIQUE NOT NULL,
-                  name VARCHAR(180) NOT NULL,
-                  description TEXT NOT NULL,
-                  service_type VARCHAR(100) NOT NULL,
-                  location_text VARCHAR(220) NOT NULL,
-                  operating_hours VARCHAR(150) NOT NULL,
-                  contact_details VARCHAR(180) NOT NULL,
-                  latitude DOUBLE PRECISION NOT NULL,
-                  longitude DOUBLE PRECISION NOT NULL,
-                  nearby_landmark_notes VARCHAR(240) NOT NULL,
-                  travel_tips TEXT NOT NULL,
-                  image_path VARCHAR(240) NOT NULL,
-                  is_featured BOOLEAN NOT NULL DEFAULT FALSE
-                );
+                    id SERIAL PRIMARY KEY,
+                    slug VARCHAR(120) UNIQUE NOT NULL,
+                    name VARCHAR(180) NOT NULL,
+                    short_description TEXT NOT NULL DEFAULT '',
+                    full_description TEXT NOT NULL DEFAULT '',
+                    service_type VARCHAR(100) NOT NULL,
+                    location_text VARCHAR(220) NOT NULL,
+                    hours VARCHAR(150) NOT NULL DEFAULT '',
+                    contact_details VARCHAR(180) NOT NULL,
+                    visitor_notes TEXT NOT NULL DEFAULT '',
+                    latitude DOUBLE PRECISION NOT NULL,
+                    longitude DOUBLE PRECISION NOT NULL,
+                    image_path VARCHAR(240) NOT NULL,
+                    status VARCHAR(30) NOT NULL DEFAULT 'open',
+                    sort_order INT NOT NULL DEFAULT 0
+                )
                 """.trimIndent()
             )
 
-            statement.execute(
+            st.execute(
                 """
                 CREATE TABLE IF NOT EXISTS tour_routes (
-                  id SERIAL PRIMARY KEY,
-                  slug VARCHAR(120) UNIQUE NOT NULL,
-                  name VARCHAR(180) NOT NULL,
-                  duration_text VARCHAR(80) NOT NULL,
-                  start_point VARCHAR(220) NOT NULL,
-                  route_description TEXT NOT NULL,
-                  distance_km DOUBLE PRECISION NOT NULL,
-                  highlights TEXT NOT NULL,
-                  is_featured BOOLEAN NOT NULL DEFAULT FALSE
-                );
+                    id SERIAL PRIMARY KEY,
+                    slug VARCHAR(120) UNIQUE NOT NULL,
+                    name VARCHAR(180) NOT NULL,
+                    short_description TEXT NOT NULL DEFAULT '',
+                    full_description TEXT NOT NULL DEFAULT '',
+                    route_type VARCHAR(80) NOT NULL DEFAULT '',
+                    starting_point VARCHAR(220) NOT NULL DEFAULT '',
+                    estimated_duration VARCHAR(80) NOT NULL DEFAULT '',
+                    travel_tips TEXT NOT NULL DEFAULT '',
+                    distance_text VARCHAR(80) NOT NULL DEFAULT '',
+                    map_link TEXT NOT NULL DEFAULT '',
+                    is_featured BOOLEAN NOT NULL DEFAULT FALSE,
+                    status VARCHAR(30) NOT NULL DEFAULT 'open',
+                    sort_order INT NOT NULL DEFAULT 0
+                )
                 """.trimIndent()
             )
+
+            // compatibility columns for previously seeded DBs
+            st.execute("ALTER TABLE attractions ADD COLUMN IF NOT EXISTS historical_period VARCHAR(120) NOT NULL DEFAULT ''")
+            st.execute("ALTER TABLE attractions ADD COLUMN IF NOT EXISTS visitor_tips TEXT NOT NULL DEFAULT ''")
+            st.execute("ALTER TABLE attractions ADD COLUMN IF NOT EXISTS best_time_to_visit VARCHAR(120) NOT NULL DEFAULT ''")
+            st.execute("ALTER TABLE attractions ADD COLUMN IF NOT EXISTS sort_order INT NOT NULL DEFAULT 0")
+
+            st.execute("ALTER TABLE dining_places ADD COLUMN IF NOT EXISTS short_description TEXT NOT NULL DEFAULT ''")
+            st.execute("ALTER TABLE dining_places ADD COLUMN IF NOT EXISTS full_description TEXT NOT NULL DEFAULT ''")
+            st.execute("ALTER TABLE dining_places ADD COLUMN IF NOT EXISTS dining_type VARCHAR(100) NOT NULL DEFAULT ''")
+            st.execute("ALTER TABLE dining_places ADD COLUMN IF NOT EXISTS cuisine VARCHAR(100) NOT NULL DEFAULT ''")
+            st.execute("ALTER TABLE dining_places ADD COLUMN IF NOT EXISTS visitor_notes TEXT NOT NULL DEFAULT ''")
+            st.execute("ALTER TABLE dining_places ADD COLUMN IF NOT EXISTS status VARCHAR(30) NOT NULL DEFAULT 'open'")
+            st.execute("ALTER TABLE dining_places ADD COLUMN IF NOT EXISTS sort_order INT NOT NULL DEFAULT 0")
+            if (columnExists(connection, "dining_places", "description")) {
+                st.execute("UPDATE dining_places SET short_description = COALESCE(NULLIF(short_description,''), description)")
+                st.execute("UPDATE dining_places SET full_description = COALESCE(NULLIF(full_description,''), description)")
+            }
+            if (columnExists(connection, "dining_places", "cuisine_or_type")) {
+                st.execute("UPDATE dining_places SET dining_type = COALESCE(NULLIF(dining_type,''), cuisine_or_type)")
+                st.execute("UPDATE dining_places SET cuisine = COALESCE(NULLIF(cuisine,''), cuisine_or_type)")
+            }
+
+            st.execute("ALTER TABLE local_services ADD COLUMN IF NOT EXISTS short_description TEXT NOT NULL DEFAULT ''")
+            st.execute("ALTER TABLE local_services ADD COLUMN IF NOT EXISTS full_description TEXT NOT NULL DEFAULT ''")
+            st.execute("ALTER TABLE local_services ADD COLUMN IF NOT EXISTS hours VARCHAR(150) NOT NULL DEFAULT ''")
+            st.execute("ALTER TABLE local_services ADD COLUMN IF NOT EXISTS visitor_notes TEXT NOT NULL DEFAULT ''")
+            st.execute("ALTER TABLE local_services ADD COLUMN IF NOT EXISTS status VARCHAR(30) NOT NULL DEFAULT 'open'")
+            st.execute("ALTER TABLE local_services ADD COLUMN IF NOT EXISTS sort_order INT NOT NULL DEFAULT 0")
+            if (columnExists(connection, "local_services", "description")) {
+                st.execute("UPDATE local_services SET short_description = COALESCE(NULLIF(short_description,''), description)")
+                st.execute("UPDATE local_services SET full_description = COALESCE(NULLIF(full_description,''), description)")
+            }
+            if (columnExists(connection, "local_services", "operating_hours")) {
+                st.execute("UPDATE local_services SET hours = COALESCE(NULLIF(hours,''), operating_hours)")
+            }
+            if (columnExists(connection, "local_services", "travel_tips")) {
+                st.execute("UPDATE local_services SET visitor_notes = COALESCE(NULLIF(visitor_notes,''), travel_tips)")
+            }
+
+            st.execute("ALTER TABLE tour_routes ADD COLUMN IF NOT EXISTS short_description TEXT NOT NULL DEFAULT ''")
+            st.execute("ALTER TABLE tour_routes ADD COLUMN IF NOT EXISTS full_description TEXT NOT NULL DEFAULT ''")
+            st.execute("ALTER TABLE tour_routes ADD COLUMN IF NOT EXISTS route_type VARCHAR(80) NOT NULL DEFAULT ''")
+            st.execute("ALTER TABLE tour_routes ADD COLUMN IF NOT EXISTS starting_point VARCHAR(220) NOT NULL DEFAULT ''")
+            st.execute("ALTER TABLE tour_routes ADD COLUMN IF NOT EXISTS estimated_duration VARCHAR(80) NOT NULL DEFAULT ''")
+            st.execute("ALTER TABLE tour_routes ADD COLUMN IF NOT EXISTS travel_tips TEXT NOT NULL DEFAULT ''")
+            st.execute("ALTER TABLE tour_routes ADD COLUMN IF NOT EXISTS distance_text VARCHAR(80) NOT NULL DEFAULT ''")
+            st.execute("ALTER TABLE tour_routes ADD COLUMN IF NOT EXISTS map_link TEXT NOT NULL DEFAULT ''")
+            st.execute("ALTER TABLE tour_routes ADD COLUMN IF NOT EXISTS status VARCHAR(30) NOT NULL DEFAULT 'open'")
+            st.execute("ALTER TABLE tour_routes ADD COLUMN IF NOT EXISTS sort_order INT NOT NULL DEFAULT 0")
+            if (columnExists(connection, "tour_routes", "route_description")) {
+                st.execute("UPDATE tour_routes SET full_description = COALESCE(NULLIF(full_description,''), route_description)")
+                st.execute("UPDATE tour_routes SET short_description = COALESCE(NULLIF(short_description,''), SUBSTRING(route_description FROM 1 FOR 150))")
+            }
+            if (columnExists(connection, "tour_routes", "start_point")) {
+                st.execute("UPDATE tour_routes SET starting_point = COALESCE(NULLIF(starting_point,''), start_point)")
+            }
+            if (columnExists(connection, "tour_routes", "duration_text")) {
+                st.execute("UPDATE tour_routes SET estimated_duration = COALESCE(NULLIF(estimated_duration,''), duration_text)")
+            }
+            if (columnExists(connection, "tour_routes", "distance_km")) {
+                st.execute("UPDATE tour_routes SET distance_text = COALESCE(NULLIF(distance_text,''), CONCAT(distance_km, ' km'))")
+            }
+            if (columnExists(connection, "tour_routes", "highlights")) {
+                st.execute("UPDATE tour_routes SET travel_tips = COALESCE(NULLIF(travel_tips,''), highlights)")
+            }
+
+            st.execute("CREATE TABLE IF NOT EXISTS admins (id SERIAL PRIMARY KEY, email VARCHAR(180) UNIQUE NOT NULL, password_hash VARCHAR(255) NOT NULL, role VARCHAR(40) NOT NULL DEFAULT 'super_admin', created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP)")
         }
     }
 
     fun seedData(connection: Connection) {
-        seedAdmin(connection)
-        seedAttractions(connection)
-        seedDining(connection)
-        seedServices(connection)
-        seedTourRoutes(connection)
-    }
-
-    private fun seedAdmin(connection: Connection) {
-        if (tableHasData(connection, "admins")) return
-
-        connection.prepareStatement(
-            "INSERT INTO admins (email, password_hash, role) VALUES (?, ?, ?)"
-        ).use { ps ->
-            ps.setString(1, "admin@qrventure.local")
-            ps.setString(2, hashPassword("Admin123!"))
-            ps.setString(3, "super_admin")
-            ps.executeUpdate()
+        if (!tableHasData(connection, "admins")) {
+            connection.createStatement().executeUpdate("INSERT INTO admins (email, password_hash, role) VALUES ('admin@qrventure.local', 'seed-managed', 'super_admin')")
         }
-    }
-
-    private fun seedAttractions(connection: Connection) {
-        if (tableHasData(connection, "attractions")) return
-
-        connection.prepareStatement(
-            """
-            INSERT INTO attractions
-            (slug, name, short_description, full_description, category, location_text, opening_hours, entrance_fee, contact_details, latitude, longitude, image_path, status, is_featured)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            """.trimIndent()
-        ).use { ps ->
-            listOf(
-                listOf("fort-santiago", "Fort Santiago", "Historic citadel and Rizal memorial destination.", "Fort Santiago is one of Intramuros' most visited heritage landmarks, known for its stone gates, riverfront promenades, and galleries dedicated to Dr. Jose Rizal's final days.", "Historic Landmark", "Santa Clara Street, Intramuros", "8:00 AM - 11:00 PM", "PHP 75 regular / PHP 50 student", "(02) 8527 2961", 14.5953, 120.9701, "/qrventure/images/fort-santiago.svg", "open", true),
-                listOf("san-agustin-church", "San Agustin Church", "UNESCO-listed baroque church and museum.", "Completed in 1607, San Agustin Church features ornate interiors, centuries-old religious artifacts, and a museum that narrates Manila's colonial and wartime history.", "Religious Heritage", "General Luna Street, Intramuros", "8:00 AM - 5:00 PM", "Church free / Museum PHP 200", "(02) 8527 4064", 14.5898, 120.9747, "/qrventure/images/san-agustin.svg", "open", true),
-                listOf("casa-manila", "Casa Manila", "Recreation of a Spanish colonial bahay na bato.", "Casa Manila offers curated period rooms, decorative arts, and daily-life exhibits that help visitors experience elite Manila household culture during the Spanish period.", "Museum", "Plaza San Luis Complex, Intramuros", "9:00 AM - 6:00 PM", "PHP 75", "(02) 8527 4084", 14.5892, 120.9749, "/qrventure/images/baluarte.svg", "open", true),
-                listOf("baluarte-de-san-diego", "Baluarte de San Diego", "Gardened bastion with panoramic wall views.", "Baluarte de San Diego combines restored stonework, a circular bastion, and open gardens ideal for short history walks and photo stops.", "Historic Fortification", "Sta. Lucia Street, Intramuros", "8:00 AM - 5:00 PM", "PHP 75", "(02) 8527 4084", 14.5888, 120.9753, "/qrventure/images/baluarte.svg", "open", false),
-                listOf("manila-cathedral", "Manila Cathedral", "Neo-romanesque cathedral at the heart of Plaza Roma.", "The Minor Basilica and Metropolitan Cathedral of the Immaculate Conception has been rebuilt multiple times and remains a spiritual and architectural anchor in Intramuros.", "Religious Heritage", "Cabildo Street, Intramuros", "7:30 AM - 5:30 PM", "Free admission", "(02) 8527 1796", 14.5911, 120.9736, "/qrventure/images/san-agustin.svg", "open", true),
-                listOf("plaza-roma", "Plaza Roma", "Historic civic square surrounded by key landmarks.", "Plaza Roma is the ceremonial center of Intramuros, located between Manila Cathedral and Palacio del Gobernador, and serves as a convenient orientation point.", "Plaza", "Cabildo Street, Intramuros", "Open 24 hours", "Free admission", "Intramuros Administration", 14.5906, 120.9734, "/qrventure/images/fort-santiago.svg", "open", false),
-                listOf("puerta-del-parian", "Puerta del Parian", "Restored gate that once linked trade routes.", "Puerta del Parian is one of the traditional entrances into the walled city, highlighting old access control systems and urban defense planning.", "City Gate", "Muralla Street, Intramuros", "Open 24 hours", "Free admission", "Intramuros Administration", 14.5923, 120.9718, "/qrventure/images/fort-santiago.svg", "open", false),
-                listOf("puerta-real-gardens", "Puerta Real Gardens", "Landscaped leisure space beside historic walls.", "Puerta Real Gardens offers shaded seating, open lawns, and wall views, making it a rest stop for walking tours around southern Intramuros.", "Park", "Real Street, Intramuros", "6:00 AM - 10:00 PM", "Free admission", "Intramuros Administration", 14.5868, 120.9758, "/qrventure/images/baluarte.svg", "open", false)
-            ).forEach { row ->
-                ps.setString(1, row[0] as String)
-                ps.setString(2, row[1] as String)
-                ps.setString(3, row[2] as String)
-                ps.setString(4, row[3] as String)
-                ps.setString(5, row[4] as String)
-                ps.setString(6, row[5] as String)
-                ps.setString(7, row[6] as String)
-                ps.setString(8, row[7] as String)
-                ps.setString(9, row[8] as String)
-                ps.setDouble(10, row[9] as Double)
-                ps.setDouble(11, row[10] as Double)
-                ps.setString(12, row[11] as String)
-                ps.setString(13, row[12] as String)
-                ps.setBoolean(14, row[13] as Boolean)
-                ps.addBatch()
-            }
-            ps.executeBatch()
+        if (!tableHasData(connection, "attractions")) {
+            connection.createStatement().executeUpdate(
+                """
+                INSERT INTO attractions (slug,name,short_description,full_description,category,historical_period,location_text,opening_hours,entrance_fee,contact_details,visitor_tips,best_time_to_visit,latitude,longitude,image_path,is_featured,status,sort_order) VALUES
+                ('fort-santiago','Fort Santiago','Historic citadel and Rizal memorial destination.','Fort Santiago anchors many first-time Intramuros itineraries with bastions, river views, and galleries tracing the final days of Jose Rizal.','Historic Landmark','Spanish Colonial','Santa Clara Street, Intramuros','8:00 AM - 11:00 PM','PHP 75 regular / PHP 50 student','(02) 8527 2961','Bring water and sun protection; surfaces can be hot by noon.','Early morning or late afternoon',14.5953,120.9701,'/qrventure/images/fort-santiago.svg',TRUE,'open',1),
+                ('san-agustin-church','San Agustin Church','UNESCO-listed baroque church and museum.','Completed in 1607, San Agustin Church preserves rich liturgical art and museum archives that frame Manila''s layered colonial history.','Religious Heritage','Spanish Colonial','General Luna Street, Intramuros','8:00 AM - 5:00 PM','Church free / Museum PHP 200','(02) 8527 4064','Observe quiet etiquette during mass hours.','Weekday mornings',14.5898,120.9747,'/qrventure/images/san-agustin.svg',TRUE,'open',2),
+                ('casa-manila','Casa Manila','Recreation of a Spanish colonial bahay na bato.','Casa Manila curates period interiors, furniture, and social history to show elite domestic life in old Manila.','Museum','Spanish Colonial','Plaza San Luis Complex, Intramuros','9:00 AM - 6:00 PM','PHP 75','(02) 8527 4084','Pair your visit with nearby San Agustin Museum.','Mid-morning',14.5892,120.9749,'/qrventure/images/baluarte.svg',TRUE,'open',3),
+                ('baluarte-de-san-diego','Baluarte de San Diego','Gardened bastion with panoramic wall views.','Baluarte de San Diego combines restored masonry and landscaped grounds ideal for relaxed heritage walks and photo stops.','Historic Fortification','Spanish Colonial','Sta. Lucia Street, Intramuros','8:00 AM - 5:00 PM','PHP 75','(02) 8527 4084','Wear comfortable shoes for uneven stone paths.','Golden hour',14.5888,120.9753,'/qrventure/images/baluarte.svg',TRUE,'open',4),
+                ('manila-cathedral','Manila Cathedral','Neo-romanesque cathedral beside Plaza Roma.','The Manila Cathedral remains a spiritual and architectural focal point, rebuilt across centuries after earthquakes and war.','Religious Heritage','Spanish Colonial to Modern','Cabildo Street, Intramuros','7:30 AM - 5:30 PM','Free admission','(02) 8527 1796','Dress modestly when entering the church.','Late afternoon',14.5911,120.9736,'/qrventure/images/san-agustin.svg',TRUE,'open',5),
+                ('plaza-roma','Plaza Roma','Historic civic square in the heart of Intramuros.','Plaza Roma links major civic and religious landmarks, making it a natural orientation point for walking tours.','Plaza','Spanish Colonial','Cabildo Street, Intramuros','Open 24 hours','Free admission','Intramuros Administration','Use this as your meetup and starting point.','Sunset',14.5906,120.9734,'/qrventure/images/fort-santiago.svg',FALSE,'open',6),
+                ('puerta-del-parian','Puerta del Parian','Restored gate that once controlled trade access.','Puerta del Parian reflects Intramuros'' defensive planning and historical circulation between districts.','City Gate','Spanish Colonial','Muralla Street, Intramuros','Open 24 hours','Free admission','Intramuros Administration','Best seen with nearby wall walk segments.','Morning',14.5923,120.9718,'/qrventure/images/fort-santiago.svg',FALSE,'open',7),
+                ('puerta-real-gardens','Puerta Real Gardens','Landscaped leisure pocket beside the walls.','Puerta Real Gardens offers shaded benches and open lawns along southern Intramuros fortifications.','Park','Modern Heritage Zone','Real Street, Intramuros','6:00 AM - 10:00 PM','Free admission','Intramuros Administration','Good resting stop between route segments.','Late afternoon',14.5868,120.9758,'/qrventure/images/baluarte.svg',FALSE,'open',8),
+                ('memorare-manila-monument','Memorare Manila Monument','War memorial honoring civilian lives lost in 1945.','The monument offers an important reflective stop that contextualizes the Battle of Manila and post-war memory in the walled city.','Memorial','World War II','General Luna corner Anda, Intramuros','Open 24 hours','Free admission','Intramuros Administration','Maintain respectful silence in the area.','Early morning',14.5920,120.9719,'/qrventure/images/fort-santiago.svg',FALSE,'open',9)
+                """.trimIndent()
+            )
         }
-    }
 
-    private fun seedDining(connection: Connection) {
-        if (tableHasData(connection, "dining_places")) return
-
-        connection.prepareStatement(
-            """
-            INSERT INTO dining_places
-            (slug, name, description, cuisine_or_type, location_text, opening_hours, price_range, contact_details, latitude, longitude, image_path, is_featured)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            """.trimIndent()
-        ).use { ps ->
-            listOf(
-                listOf("barbara-s-heritage", "Barbara's Heritage Restaurant", "Heritage Filipino dining with cultural dinner performances.", "Filipino Restaurant", "General Luna Street, Intramuros", "10:00 AM - 9:00 PM", "PHP 500-1,200", "(02) 8527 3893", 14.5894, 120.9750, "/qrventure/images/dining-heritage.svg", true),
-                listOf("cafe-intramuros", "Cafe Intramuros", "Relaxed heritage cafe serving local comfort dishes and coffee.", "Heritage Cafe", "Plaza San Luis, Intramuros", "8:00 AM - 8:00 PM", "PHP 200-500", "(02) 8536 1120", 14.5899, 120.9740, "/qrventure/images/dining-cafe.svg", true),
-                listOf("carta-filipina", "Carta Filipina", "Modern Filipino plates for quick lunches near major sites.", "Filipino Restaurant", "Anda Street, Intramuros", "10:30 AM - 9:30 PM", "PHP 300-800", "0917 100 2211", 14.5949, 120.9720, "/qrventure/images/dining-tapas.svg", false),
-                listOf("muralla-coffee-stop", "Muralla Coffee Stop", "Grab-and-go coffee and pastries ideal for walkers.", "Coffee Stop", "Muralla Street, Intramuros", "7:00 AM - 7:00 PM", "PHP 120-300", "0920 889 2213", 14.5921, 120.9728, "/qrventure/images/dining-cafe.svg", false)
-            ).forEach { row ->
-                ps.setString(1, row[0] as String)
-                ps.setString(2, row[1] as String)
-                ps.setString(3, row[2] as String)
-                ps.setString(4, row[3] as String)
-                ps.setString(5, row[4] as String)
-                ps.setString(6, row[5] as String)
-                ps.setString(7, row[6] as String)
-                ps.setString(8, row[7] as String)
-                ps.setDouble(9, row[8] as Double)
-                ps.setDouble(10, row[9] as Double)
-                ps.setString(11, row[10] as String)
-                ps.setBoolean(12, row[11] as Boolean)
-                ps.addBatch()
-            }
-            ps.executeBatch()
+        if (!tableHasData(connection, "dining_places")) {
+            connection.createStatement().executeUpdate(
+                """
+                INSERT INTO dining_places (slug,name,short_description,full_description,dining_type,cuisine,location_text,opening_hours,price_range,contact_details,visitor_notes,latitude,longitude,image_path,is_featured,status,sort_order) VALUES
+                ('barbara-s-heritage','Barbara''s Heritage Restaurant','Heritage dining with cultural performances.','A popular heritage dining hall known for Filipino set menus and occasional cultural showcases near key plazas.','Restaurant','Filipino','General Luna Street, Intramuros','10:00 AM - 9:00 PM','PHP 500-1,200','(02) 8527 3893','Reserve ahead on weekends.',14.5894,120.9750,'/qrventure/images/dining-heritage.svg',TRUE,'open',1),
+                ('cafe-intramuros','Cafe Intramuros','Relaxed heritage cafe for breaks.','A quiet cafe for coffee, rice meals, and snacks close to museums and churches.','Cafe','Filipino Comfort','Plaza San Luis, Intramuros','8:00 AM - 8:00 PM','PHP 200-500','(02) 8536 1120','Good brunch stop before museum hours.',14.5899,120.9740,'/qrventure/images/dining-cafe.svg',TRUE,'open',2),
+                ('carta-filipina','Carta Filipina','Modern Filipino plates near major sites.','A contemporary Filipino dining room suitable for lunch and early dinner while exploring northern Intramuros.','Restaurant','Modern Filipino','Anda Street, Intramuros','10:30 AM - 9:30 PM','PHP 300-800','0917 100 2211','Try off-peak hours after 2 PM.',14.5949,120.9720,'/qrventure/images/dining-tapas.svg',FALSE,'open',3)
+                """.trimIndent()
+            )
         }
-    }
 
-    private fun seedServices(connection: Connection) {
-        if (tableHasData(connection, "local_services")) return
-
-        connection.prepareStatement(
-            """
-            INSERT INTO local_services
-            (slug, name, description, service_type, location_text, operating_hours, contact_details, latitude, longitude, nearby_landmark_notes, travel_tips, image_path, is_featured)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            """.trimIndent()
-        ).use { ps ->
-            listOf(
-                listOf("intra-restroom-plaza", "Plaza Roma Public Restroom", "Maintained comfort room for tourists near the cathedral area.", "Restroom", "Near Plaza Roma, Intramuros", "6:00 AM - 9:00 PM", "Onsite staff", 14.5904, 120.9732, "Beside Plaza Roma loading zone", "Carry small tissue and hand sanitizer for convenience.", "/qrventure/images/service-info.svg", true),
-                listOf("plaza-moriones-atm", "Plaza Moriones ATM Cluster", "Multiple ATM kiosks for cash withdrawal near major stops.", "ATM", "Plaza Moriones, Intramuros", "24/7", "Bank hotlines onsite", 14.5957, 120.9698, "Across open plaza gardens", "Withdraw small denominations for pedicab and entrance fees.", "/qrventure/images/service-atm.svg", true),
-                listOf("real-street-parking", "Real Street Visitor Parking", "Pay parking area for private vehicles and tour vans.", "Parking", "Real Street, Intramuros", "6:00 AM - 11:00 PM", "IA Parking Desk", 14.5872, 120.9759, "Near Puerta Real Gardens", "Arrive early on weekends to secure slots.", "/qrventure/images/service-info.svg", false),
-                listOf("intra-police-assist", "Intramuros Police Assistance Desk", "Tourist police help desk for safety concerns and lost-and-found.", "Police", "Anda Circle, Intramuros", "24/7", "PNP Hotline 911", 14.5942, 120.9723, "Near transport drop-off bays", "Report incidents immediately and keep ID ready.", "/qrventure/images/service-firstaid.svg", true),
-                listOf("intramuros-info-center", "Intramuros Information Center", "Visitor orientation, map assistance, and event updates.", "Info Center", "Fort Santiago Gate Area", "8:00 AM - 6:00 PM", "(02) 8527 3120", 14.5950, 120.9709, "Beside Fort Santiago ticketing zone", "Ask for current walking route advisories before starting.", "/qrventure/images/service-info.svg", true)
-            ).forEach { row ->
-                ps.setString(1, row[0] as String)
-                ps.setString(2, row[1] as String)
-                ps.setString(3, row[2] as String)
-                ps.setString(4, row[3] as String)
-                ps.setString(5, row[4] as String)
-                ps.setString(6, row[5] as String)
-                ps.setString(7, row[6] as String)
-                ps.setDouble(8, row[7] as Double)
-                ps.setDouble(9, row[8] as Double)
-                ps.setString(10, row[9] as String)
-                ps.setString(11, row[10] as String)
-                ps.setString(12, row[11] as String)
-                ps.setBoolean(13, row[12] as Boolean)
-                ps.addBatch()
-            }
-            ps.executeBatch()
+        if (!tableHasData(connection, "local_services")) {
+            connection.createStatement().executeUpdate(
+                """
+                INSERT INTO local_services (slug,name,short_description,full_description,service_type,location_text,hours,contact_details,visitor_notes,latitude,longitude,image_path,status,sort_order) VALUES
+                ('plaza-moriones-atm','Plaza Moriones ATM Cluster','ATM kiosks near major visitor flows.','Several bank ATM kiosks clustered near Plaza Moriones for quick cash access before route starts.','ATM','Plaza Moriones, Intramuros','24/7','Bank hotlines onsite','Withdraw small bills for transport and small vendors.',14.5957,120.9698,'/qrventure/images/service-atm.svg','open',1),
+                ('intramuros-info-center','Intramuros Information Center','Visitor orientation and maps.','Primary information desk for maps, updates, and event advisories before beginning walking routes.','Info Center','Fort Santiago Gate Area','8:00 AM - 6:00 PM','(02) 8527 3120','Ask for closures during heritage events.',14.5950,120.9709,'/qrventure/images/service-info.svg','open',2),
+                ('intra-police-assist','Intramuros Police Assistance Desk','Tourist safety assistance point.','Assistance desk for incident reporting, lost and found, and safety-related concerns in the district.','Police','Anda Circle, Intramuros','24/7','PNP Hotline 911','Keep emergency contacts ready.',14.5942,120.9723,'/qrventure/images/service-firstaid.svg','open',3)
+                """.trimIndent()
+            )
         }
-    }
 
-    private fun seedTourRoutes(connection: Connection) {
-        if (tableHasData(connection, "tour_routes")) return
-
-        connection.prepareStatement(
-            """
-            INSERT INTO tour_routes
-            (slug, name, duration_text, start_point, route_description, distance_km, highlights, is_featured)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-            """.trimIndent()
-        ).use { ps ->
-            listOf(
-                listOf("historic-core", "Historic Core", "2.5 hours", "Plaza Roma", "A comprehensive first-time loop covering the civic and religious center before ending at the walls.", 2.6, "Plaza Roma, Manila Cathedral, San Agustin Church, Casa Manila, Baluarte de San Diego", true),
-                listOf("fort-route", "Fort Route", "1.5 hours", "Fort Santiago Gate", "A focused walk through Fort Santiago and nearby wall sections with river viewpoints.", 1.4, "Fort Santiago, Rizal Shrine, Plaza Moriones, river promenade", true),
-                listOf("church-route", "Church Route", "1 hour 45 minutes", "Manila Cathedral", "A heritage-faith route that links major worship spaces and museum areas in central Intramuros.", 1.8, "Manila Cathedral, San Agustin Church, Plaza San Luis, nearby chapels", false),
-                listOf("one-hour-route", "1-Hour Route", "1 hour", "Puerta del Parian", "A short orientation route ideal for tight schedules and sunset photography.", 1.1, "Puerta del Parian, Plaza Roma, wallside viewpoints, Puerta Real Gardens", false)
-            ).forEach { row ->
-                ps.setString(1, row[0] as String)
-                ps.setString(2, row[1] as String)
-                ps.setString(3, row[2] as String)
-                ps.setString(4, row[3] as String)
-                ps.setString(5, row[4] as String)
-                ps.setDouble(6, row[5] as Double)
-                ps.setString(7, row[6] as String)
-                ps.setBoolean(8, row[7] as Boolean)
-                ps.addBatch()
-            }
-            ps.executeBatch()
+        if (!tableHasData(connection, "tour_routes")) {
+            connection.createStatement().executeUpdate(
+                """
+                INSERT INTO tour_routes (slug,name,short_description,full_description,route_type,starting_point,estimated_duration,travel_tips,distance_text,map_link,is_featured,status,sort_order) VALUES
+                ('historic-core-loop','Historic Core Loop','A complete first-time Intramuros walking circuit.','Covers Plaza Roma, Manila Cathedral, San Agustin Church, Casa Manila, and Baluarte de San Diego in one coherent path.','Heritage Walk','Plaza Roma','2.5 hours','Start early and carry water.','2.6 km','https://maps.google.com/?q=14.5906,120.9734',TRUE,'open',1),
+                ('fort-and-walls','Fort and Walls','Fort Santiago plus wallside viewpoints.','Begins at Fort Santiago and continues through wall promenades and river-facing segments for history-focused visitors.','Fortification Focus','Fort Santiago Gate','1.5 hours','Bring hat and sun protection.','1.8 km','https://maps.google.com/?q=14.5953,120.9701',TRUE,'open',2),
+                ('churches-and-plazas','Churches and Plazas','Faith and civic heritage route.','Connects Manila Cathedral, San Agustin Church, Plaza Roma, and nearby plazas with interpretation stops.','Culture & Faith','Manila Cathedral','1 hour 45 minutes','Respect mass schedules and quiet zones.','1.9 km','https://maps.google.com/?q=14.5911,120.9736',FALSE,'open',3)
+                """.trimIndent()
+            )
         }
     }
 
     private fun tableHasData(connection: Connection, table: String): Boolean {
-        connection.createStatement().use { statement ->
-            val rs = statement.executeQuery("SELECT COUNT(*) FROM $table")
-            rs.next()
-            return rs.getInt(1) > 0
+        connection.createStatement().use { st ->
+            st.executeQuery("SELECT COUNT(*) FROM $table").use { rs ->
+                rs.next()
+                return rs.getInt(1) > 0
+            }
         }
     }
 
-    private fun hashPassword(raw: String): String {
-        val digest = MessageDigest.getInstance("SHA-256").digest(raw.toByteArray())
-        return "sha256:${Base64.getEncoder().encodeToString(digest)}"
+    private fun columnExists(connection: Connection, table: String, column: String): Boolean {
+        connection.metaData.getColumns(null, null, table, column).use { rs ->
+            return rs.next()
+        }
     }
 }

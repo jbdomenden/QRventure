@@ -9,6 +9,7 @@ postgres:
   url: "jdbc:postgresql://localhost:5434/qrventure_db"
   user: "postgres"
   password: "root"
+  required: true
 
 adminAuth:
   username: "admin"

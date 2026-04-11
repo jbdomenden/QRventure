@@ -14,10 +14,13 @@ document.addEventListener('DOMContentLoaded', async () => {
       const blocks = [
         ['Attractions', data.attractions, 'attractions'],
         ['Dining', data.dining, 'dining'],
-        ['Services', data.services, 'services']
+        ['Services', data.services, 'services'],
+        ['Routes', data.routes, 'routes']
       ].map(([title, items, type]) => `<section><h3>${title}</h3>${items.length ? `<div class="grid cards">${items.map(i => cardHtml(i, type)).join('')}</div>` : '<p class="meta">No matches</p>'}</section>`);
       out.innerHTML = blocks.join('');
-    } catch (e) { renderState(out, e.message, true); }
+    } catch (e) {
+      renderState(out, e.message, true);
+    }
   }
 
   if (q) runSearch(q);
