@@ -175,6 +175,7 @@ object DatabaseFactory {
 
             st.execute("CREATE TABLE IF NOT EXISTS admins (id SERIAL PRIMARY KEY, email VARCHAR(180) UNIQUE NOT NULL, password_hash VARCHAR(255) NOT NULL, role VARCHAR(40) NOT NULL DEFAULT 'super_admin', created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP)")
         }
+    }
 
     fun seedData(connection: Connection) {
         if (!tableHasData(connection, "admins")) {
@@ -229,10 +230,21 @@ object DatabaseFactory {
                 """.trimIndent()
             )
         }
+
+    private fun tableHasData(connection: Connection, table: String): Boolean {
+        connection.createStatement().use { st ->
+            st.executeQuery("SELECT COUNT(*) FROM $table").use { rs ->
+                rs.next()
+                return rs.getInt(1) > 0
+            }
+        }
     }
 
-    private fun tableHasData(connection: Connection, table: String): Boolean =
-        connection.createStatement().use { st -> st.executeQuery("SELECT COUNT(*) FROM $table").let { it.next(); it.getInt(1) > 0 } }
+    private fun columnExists(connection: Connection, table: String, column: String): Boolean {
+        connection.metaData.getColumns(null, null, table, column).use { rs ->
+            return rs.next()
+        }
+    }
 }
 
 
