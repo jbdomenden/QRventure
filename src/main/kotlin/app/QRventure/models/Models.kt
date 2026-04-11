@@ -3,15 +3,6 @@ package app.QRventure.models
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class Admin(
-    val id: Int,
-    val email: String,
-    val passwordHash: String,
-    val role: String,
-    val createdAt: String
-)
-
-@Serializable
 data class Attraction(
     val id: Int,
     val slug: String,

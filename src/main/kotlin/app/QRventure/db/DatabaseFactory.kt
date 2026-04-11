@@ -183,7 +183,6 @@ object DatabaseFactory {
                 st.execute("UPDATE tour_routes SET travel_tips = COALESCE(NULLIF(travel_tips,''), highlights)")
             }
 
-            st.execute("CREATE TABLE IF NOT EXISTS admins (id SERIAL PRIMARY KEY, email VARCHAR(180) UNIQUE NOT NULL, password_hash VARCHAR(255) NOT NULL, role VARCHAR(40) NOT NULL DEFAULT 'super_admin', created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP)")
             st.execute("UPDATE attractions SET image_urls = CONCAT('[\"', image_path, '\"]') WHERE image_urls = ''")
             st.execute("UPDATE dining_places SET image_urls = CONCAT('[\"', image_path, '\"]') WHERE image_urls = ''")
             st.execute("UPDATE local_services SET image_urls = CONCAT('[\"', image_path, '\"]') WHERE image_urls = ''")
@@ -192,9 +191,6 @@ object DatabaseFactory {
     }
 
     fun seedData(connection: Connection) {
-        if (!tableHasData(connection, "admins")) {
-            connection.createStatement().executeUpdate("INSERT INTO admins (email, password_hash, role) VALUES ('admin@qrventure.local', 'seed-managed', 'super_admin')")
-        }
         if (!tableHasData(connection, "attractions")) {
             connection.createStatement().executeUpdate(
                 """
