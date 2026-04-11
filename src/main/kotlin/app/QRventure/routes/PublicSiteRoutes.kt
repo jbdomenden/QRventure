@@ -18,7 +18,7 @@ fun Application.configurePublicSiteRoutes() {
         get("/qrventure") { call.respondRedirect("/qrventure/index.html", permanent = false) }
         get("/qrventure/") { call.respondRedirect("/qrventure/index.html", permanent = false) }
 
-        listOf("attractions", "attraction-detail", "dining", "dining-detail", "services", "service-detail", "navigation", "routes").forEach { page ->
+        listOf("attractions", "attraction-detail", "dining", "dining-detail", "services", "service-detail", "navigation", "routes", "route-detail").forEach { page ->
             get("/qrventure/$page") { call.respondRedirect("/qrventure/$page.html", permanent = false) }
         }
 
