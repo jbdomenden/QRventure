@@ -1,8 +1,8 @@
 package app.QRventure.dto
 
-import app.QRventure.model.Attraction
-import app.QRventure.model.DiningPlace
-import app.QRventure.model.LocalService
+import app.QRventure.models.Attraction
+import app.QRventure.models.DiningPlace
+import app.QRventure.models.LocalService
 import kotlinx.serialization.Serializable
 
 @Serializable

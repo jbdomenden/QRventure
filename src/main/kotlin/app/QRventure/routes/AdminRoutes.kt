@@ -5,7 +5,7 @@ import app.QRventure.auth.AdminSession
 import app.QRventure.auth.loadAdminCredentials
 import app.QRventure.auth.verifyPassword
 import app.QRventure.dto.*
-import app.QRventure.service.TourismService
+import app.QRventure.services.TourismService
 import io.ktor.http.*
 import io.ktor.http.content.PartData
 import io.ktor.http.content.forEachPart
