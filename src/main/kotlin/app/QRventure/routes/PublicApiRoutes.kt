@@ -44,6 +44,11 @@ fun Application.configurePublicApiRoutes(connection: Connection?) {
                 call.respond(service.search(query))
             }
             get("/routes") { call.respond(service.tourRoutes(call.request.queryParameters["q"])) }
+            get("/routes/{key}") {
+                val key = call.parameters["key"] ?: return@get call.respond(HttpStatusCode.BadRequest, ErrorResponse("Missing route key"))
+                val item = service.tourRouteBySlugOrId(key)
+                if (item == null) call.respond(HttpStatusCode.NotFound, ErrorResponse("Route not found")) else call.respond(item)
+            }
         }
     }
 }
