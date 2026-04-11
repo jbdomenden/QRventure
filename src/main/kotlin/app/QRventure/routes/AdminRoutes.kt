@@ -32,7 +32,7 @@ fun Application.configureAdminRoutes(connection: java.sql.Connection?) {
 
     routing {
         get("/admin") {
-            val destination = if (call.sessions.get<AdminSession>() == null) "/admin/login" else "/qrventure/admin/index.html"
+            val destination = if (call.sessions.get<AdminSession>() == null) "/admin/login" else "/qrventure/admin/dashboard.html"
             call.respondRedirect(destination, permanent = false)
         }
 

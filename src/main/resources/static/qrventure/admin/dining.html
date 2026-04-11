@@ -1,0 +1,8 @@
+<!doctype html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Dining CMS | QRventure</title><link rel="stylesheet" href="/qrventure/css/styles.css"></head><body>
+<main class="container section"><p><a class="btn btn-secondary" href="/qrventure/admin/dashboard.html">← Dashboard</a></p>
+<section class="card"><h1>Dining CMS</h1><p class="meta">Manage dining records and publish updates.</p></section>
+<section class="card">
+<div class="admin-toolbar"><input id="searchInput" class="input" placeholder="Search dining"><div class="admin-actions"><button id="refreshBtn" class="btn btn-secondary">Refresh</button><button id="createBtn" class="btn btn-primary">New</button><button id="logoutBtn" class="btn btn-secondary">Log out</button></div></div>
+<div id="listState"></div><div id="records" class="admin-list"></div></section>
+<section class="card"><h2 id="editorTitle">Editor</h2><form id="editorForm" class="form-grid"></form><div class="upload-row"><input id="fileInput" type="file" accept="image/jpeg,image/png,image/webp"><button id="uploadBtn" class="btn btn-secondary" type="button">Upload image</button></div><div class="admin-actions"><button id="saveBtn" class="btn btn-primary" type="submit" form="editorForm">Save</button><button id="deleteBtn" class="btn btn-secondary" type="button" disabled>Delete</button><button id="cancelBtn" class="btn btn-secondary" type="button">Cancel</button></div><div id="formState"></div></section></main>
+<script>window.ADMIN_ENTITY='dining';</script><script type="module" src="/qrventure/js/admin-cms.js"></script></body></html>
