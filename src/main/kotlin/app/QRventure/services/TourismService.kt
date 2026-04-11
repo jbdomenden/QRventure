@@ -251,6 +251,7 @@ private fun ResultSet.toAttraction() = Attraction(
     locationText = getString("location_text"), openingHours = getString("opening_hours"), entranceFee = getString("entrance_fee"),
     contactDetails = getString("contact_details"), visitorTips = getString("visitor_tips"), bestTimeToVisit = getString("best_time_to_visit"),
     latitude = getDouble("latitude"), longitude = getDouble("longitude"), imagePath = getString("image_path"),
+    imageUrls = parseImageUrls(getString("image_urls"), getString("image_path")),
     isFeatured = getBoolean("is_featured"), status = getString("status"), sortOrder = getInt("sort_order")
 )
 
@@ -259,7 +260,8 @@ private fun ResultSet.toDining() = DiningPlace(
     fullDescription = getString("full_description"), diningType = getString("dining_type"), cuisine = getString("cuisine"),
     locationText = getString("location_text"), openingHours = getString("opening_hours"), priceRange = getString("price_range"),
     contactDetails = getString("contact_details"), visitorNotes = getString("visitor_notes"), latitude = getDouble("latitude"),
-    longitude = getDouble("longitude"), imagePath = getString("image_path"), isFeatured = getBoolean("is_featured"),
+    longitude = getDouble("longitude"), imagePath = getString("image_path"),
+    imageUrls = parseImageUrls(getString("image_urls"), getString("image_path")), isFeatured = getBoolean("is_featured"),
     status = getString("status"), sortOrder = getInt("sort_order")
 )
 
@@ -268,6 +270,7 @@ private fun ResultSet.toService() = LocalService(
     fullDescription = getString("full_description"), serviceType = getString("service_type"), locationText = getString("location_text"),
     hours = getString("hours"), contactDetails = getString("contact_details"), visitorNotes = getString("visitor_notes"),
     latitude = getDouble("latitude"), longitude = getDouble("longitude"), imagePath = getString("image_path"),
+    imageUrls = parseImageUrls(getString("image_urls"), getString("image_path")),
     status = getString("status"), sortOrder = getInt("sort_order")
 )
 
@@ -277,3 +280,16 @@ private fun ResultSet.toTourRoute() = TourRoute(
     estimatedDuration = getString("estimated_duration"), travelTips = getString("travel_tips"), distanceText = getString("distance_text"),
     mapLink = getString("map_link"), isFeatured = getBoolean("is_featured"), status = getString("status"), sortOrder = getInt("sort_order")
 )
+
+private fun parseImageUrls(raw: String?, fallbackImagePath: String?): List<String> {
+    val fromJson = raw?.trim().orEmpty()
+        .removePrefix("[")
+        .removeSuffix("]")
+        .split(",")
+        .map { it.trim().trim('"') }
+        .filter { it.startsWith("http://") || it.startsWith("https://") }
+    if (fromJson.isNotEmpty()) return fromJson
+
+    val fallback = fallbackImagePath?.trim().orEmpty()
+    return if (fallback.startsWith("http://") || fallback.startsWith("https://")) listOf(fallback) else emptyList()
+}
