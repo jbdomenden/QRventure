@@ -230,7 +230,6 @@ object DatabaseFactory {
                 """.trimIndent()
             )
         }
-    }
 
     private fun tableHasData(connection: Connection, table: String): Boolean {
         connection.createStatement().use { st ->
@@ -247,3 +246,7 @@ object DatabaseFactory {
         }
     }
 }
+
+
+private fun columnExists(connection: Connection, table: String, column: String): Boolean =
+    connection.metaData.getColumns(null, null, table, column).use { it.next() }
