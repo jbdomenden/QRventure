@@ -5,7 +5,7 @@ import app.QRventure.auth.AdminSession
 import app.QRventure.auth.loadAdminCredentials
 import app.QRventure.auth.verifyPassword
 import app.QRventure.dto.*
-import app.QRventure.service.TourismService
+import app.QRventure.services.TourismService
 import io.ktor.http.*
 import io.ktor.http.content.PartData
 import io.ktor.http.content.forEachPart
@@ -32,7 +32,7 @@ fun Application.configureAdminRoutes(connection: java.sql.Connection?) {
 
     routing {
         get("/admin") {
-            val destination = if (call.sessions.get<AdminSession>() == null) "/admin/login" else "/qrventure/admin/index.html"
+            val destination = if (call.sessions.get<AdminSession>() == null) "/admin/login" else "/qrventure/admin/dashboard.html"
             call.respondRedirect(destination, permanent = false)
         }
 

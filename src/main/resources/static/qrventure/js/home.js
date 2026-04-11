@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       </section>
       <section>
         <div class="section-header"><h2>Walking Routes</h2><p>Start with these curated itineraries.</p></div>
-        <div class="grid cards">${routes.slice(0, 3).map(r => cardHtml(r, 'routes')).join('')}</div>
+        <div class="grid cards">${(featured.routes || routes).slice(0, 3).map(r => cardHtml(r, 'routes')).join('')}</div>
       </section>
       <section>
         <div class="section-header"><h2>Dining Highlights</h2><p>Notable stops for breaks between sites.</p></div>
