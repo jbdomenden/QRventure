@@ -3,19 +3,11 @@ package app.QRventure.models
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class Admin(
-    val id: Int,
-    val email: String,
-    val passwordHash: String,
-    val role: String,
-    val createdAt: String
-)
-
-@Serializable
 data class Attraction(
     val id: Int,
     val slug: String,
     val name: String,
+    val alternateNames: List<String> = emptyList(),
     val shortDescription: String,
     val fullDescription: String,
     val category: String,
@@ -28,7 +20,9 @@ data class Attraction(
     val bestTimeToVisit: String,
     val latitude: Double,
     val longitude: Double,
+    val imageUrl: String,
     val imagePath: String,
+    val imageUrls: List<String> = emptyList(),
     val isFeatured: Boolean,
     val status: String,
     val sortOrder: Int
@@ -50,7 +44,9 @@ data class DiningPlace(
     val visitorNotes: String,
     val latitude: Double,
     val longitude: Double,
+    val imageUrl: String,
     val imagePath: String,
+    val imageUrls: List<String> = emptyList(),
     val isFeatured: Boolean,
     val status: String,
     val sortOrder: Int
@@ -70,7 +66,9 @@ data class LocalService(
     val visitorNotes: String,
     val latitude: Double,
     val longitude: Double,
+    val imageUrl: String,
     val imagePath: String,
+    val imageUrls: List<String> = emptyList(),
     val status: String,
     val sortOrder: Int
 )
@@ -88,6 +86,8 @@ data class TourRoute(
     val travelTips: String,
     val distanceText: String,
     val mapLink: String,
+    val imageUrl: String,
+    val imageUrls: List<String> = emptyList(),
     val isFeatured: Boolean,
     val status: String,
     val sortOrder: Int

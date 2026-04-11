@@ -1,8 +1,6 @@
 package app.QRventure
 
-import app.QRventure.auth.configureAdminAuth
 import app.QRventure.db.DatabaseFactory
-import app.QRventure.routes.configureAdminRoutes
 import app.QRventure.routes.configurePublicApiRoutes
 import app.QRventure.routes.configurePublicSiteRoutes
 import io.ktor.server.application.*
@@ -14,7 +12,6 @@ fun main(args: Array<String>) {
 fun Application.module() {
     configureHTTP()
     configureSerialization()
-    configureAdminAuth()
 
     val isDatabaseRequired = environment.config.propertyOrNull("postgres.required")?.getString()?.toBooleanStrictOrNull() ?: true
 
@@ -43,6 +40,5 @@ fun Application.module() {
     }
 
     configurePublicApiRoutes(connection)
-    configureAdminRoutes(connection)
     configurePublicSiteRoutes()
 }
