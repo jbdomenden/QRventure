@@ -2,12 +2,14 @@ package app.QRventure.auth
 
 import io.ktor.server.application.*
 import io.ktor.server.sessions.*
+import kotlinx.serialization.Serializable
 import java.security.MessageDigest
 import java.util.Base64
 import javax.crypto.SecretKeyFactory
 import javax.crypto.spec.PBEKeySpec
 import kotlin.time.Duration.Companion.hours
 
+@Serializable
 data class AdminSession(val username: String)
 
 data class AdminCredentials(
