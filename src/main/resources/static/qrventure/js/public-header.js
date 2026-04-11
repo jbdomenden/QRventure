@@ -14,7 +14,6 @@ function mountPublicHeader() {
   if (!target) return;
 
   const title = target.dataset.headerTitle || 'QRventure Intramuros';
-  const fallback = target.dataset.backFallback || '/qrventure/';
   const showLinks = target.dataset.showLinks !== 'false';
   const rightActions = target.dataset.headerActions || '';
 
@@ -31,11 +30,7 @@ function mountPublicHeader() {
   `;
 
   target.querySelector('.public-back-button')?.addEventListener('click', () => {
-    if (window.history.length > 1) {
-      window.history.back();
-      return;
-    }
-    window.location.href = fallback;
+    window.location.href = '/qrventure/';
   });
 }
 
