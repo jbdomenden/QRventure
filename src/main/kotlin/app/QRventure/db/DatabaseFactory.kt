@@ -175,7 +175,6 @@ object DatabaseFactory {
 
             st.execute("CREATE TABLE IF NOT EXISTS admins (id SERIAL PRIMARY KEY, email VARCHAR(180) UNIQUE NOT NULL, password_hash VARCHAR(255) NOT NULL, role VARCHAR(40) NOT NULL DEFAULT 'super_admin', created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP)")
         }
-    }
 
     fun seedData(connection: Connection) {
         if (!tableHasData(connection, "admins")) {
