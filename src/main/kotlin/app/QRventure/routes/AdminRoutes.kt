@@ -15,8 +15,7 @@ import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.server.sessions.*
-import io.ktor.utils.io.core.readByteArray
-import io.ktor.utils.io.core.readRemaining
+import io.ktor.utils.io.jvm.javaio.toInputStream
 import kotlinx.serialization.Serializable
 import java.nio.file.Files
 import java.nio.file.Paths
@@ -305,9 +304,19 @@ private fun saveUpload(filePart: PartData.FileItem): Result<String> = runCatchin
     val targetFile = uploadsDir.resolve(generatedName)
 
     try {
-        val bytes = filePart.provider().readRemaining(maxUploadBytes + 1).readByteArray()
-        require(bytes.size.toLong() <= maxUploadBytes) { "File exceeds 5MB limit." }
-        Files.write(targetFile, bytes)
+        filePart.provider().toInputStream().use { input ->
+            Files.newOutputStream(targetFile).use { output ->
+                val buffer = ByteArray(8 * 1024)
+                var total = 0L
+                while (true) {
+                    val read = input.read(buffer)
+                    if (read <= 0) break
+                    total += read
+                    require(total <= maxUploadBytes) { "File exceeds 5MB limit." }
+                    output.write(buffer, 0, read)
+                }
+            }
+        }
     } catch (ex: Exception) {
         Files.deleteIfExists(targetFile)
         throw ex
