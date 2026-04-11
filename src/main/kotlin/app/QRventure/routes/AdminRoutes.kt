@@ -15,6 +15,8 @@ import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.server.sessions.*
+import io.ktor.utils.io.core.readByteArray
+import io.ktor.utils.io.core.readRemaining
 import kotlinx.serialization.Serializable
 import java.nio.file.Files
 import java.nio.file.Paths
@@ -272,11 +274,13 @@ fun Application.configureAdminRoutes(connection: java.sql.Connection?) {
     }
 }
 
-private suspend inline fun <reified T> ApplicationCall.parseBody(): T? =
-    runCatching { this.receive<T>() }.getOrElse {
-        this.respond(HttpStatusCode.BadRequest, ErrorResponse("Invalid request body."))
+private suspend inline fun <reified T : Any> ApplicationCall.parseBody(): T? {
+    val call = this
+    return runCatching { call.receive<T>() }.getOrElse {
+        call.respond(HttpStatusCode.BadRequest, ErrorResponse("Invalid request body."))
         null
     }
+}
 
 private suspend fun ApplicationCall.requireAdminSession(): AdminSession? {
     val session = sessions.get<AdminSession>()
@@ -301,19 +305,9 @@ private fun saveUpload(filePart: PartData.FileItem): Result<String> = runCatchin
     val targetFile = uploadsDir.resolve(generatedName)
 
     try {
-        filePart.streamProvider().use { input ->
-            Files.newOutputStream(targetFile).use { output ->
-                val buffer = ByteArray(8 * 1024)
-                var total = 0L
-                while (true) {
-                    val read = input.read(buffer)
-                    if (read <= 0) break
-                    total += read
-                    require(total <= maxUploadBytes) { "File exceeds 5MB limit." }
-                    output.write(buffer, 0, read)
-                }
-            }
-        }
+        val bytes = filePart.provider().readRemaining(maxUploadBytes + 1).readByteArray()
+        require(bytes.size.toLong() <= maxUploadBytes) { "File exceeds 5MB limit." }
+        Files.write(targetFile, bytes)
     } catch (ex: Exception) {
         Files.deleteIfExists(targetFile)
         throw ex
