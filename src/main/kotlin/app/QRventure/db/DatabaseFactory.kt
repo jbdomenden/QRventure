@@ -103,6 +103,8 @@ object DatabaseFactory {
                     travel_tips TEXT NOT NULL DEFAULT '',
                     distance_text VARCHAR(80) NOT NULL DEFAULT '',
                     map_link TEXT NOT NULL DEFAULT '',
+                    image_url VARCHAR(500) NOT NULL DEFAULT '',
+                    image_urls TEXT NOT NULL DEFAULT '',
                     is_featured BOOLEAN NOT NULL DEFAULT FALSE,
                     status VARCHAR(30) NOT NULL DEFAULT 'open',
                     sort_order INT NOT NULL DEFAULT 0
@@ -160,6 +162,8 @@ object DatabaseFactory {
             st.execute("ALTER TABLE tour_routes ADD COLUMN IF NOT EXISTS travel_tips TEXT NOT NULL DEFAULT ''")
             st.execute("ALTER TABLE tour_routes ADD COLUMN IF NOT EXISTS distance_text VARCHAR(80) NOT NULL DEFAULT ''")
             st.execute("ALTER TABLE tour_routes ADD COLUMN IF NOT EXISTS map_link TEXT NOT NULL DEFAULT ''")
+            st.execute("ALTER TABLE tour_routes ADD COLUMN IF NOT EXISTS image_url VARCHAR(500) NOT NULL DEFAULT ''")
+            st.execute("ALTER TABLE tour_routes ADD COLUMN IF NOT EXISTS image_urls TEXT NOT NULL DEFAULT ''")
             st.execute("ALTER TABLE tour_routes ADD COLUMN IF NOT EXISTS status VARCHAR(30) NOT NULL DEFAULT 'open'")
             st.execute("ALTER TABLE tour_routes ADD COLUMN IF NOT EXISTS sort_order INT NOT NULL DEFAULT 0")
             if (columnExists(connection, "tour_routes", "route_description")) {
@@ -183,6 +187,7 @@ object DatabaseFactory {
             st.execute("UPDATE attractions SET image_urls = CONCAT('[\"', image_path, '\"]') WHERE image_urls = ''")
             st.execute("UPDATE dining_places SET image_urls = CONCAT('[\"', image_path, '\"]') WHERE image_urls = ''")
             st.execute("UPDATE local_services SET image_urls = CONCAT('[\"', image_path, '\"]') WHERE image_urls = ''")
+            st.execute("UPDATE tour_routes SET image_urls = CONCAT('[\"', image_url, '\"]') WHERE image_urls = '' AND image_url <> ''")
         }
     }
 
@@ -232,12 +237,24 @@ object DatabaseFactory {
         if (!tableHasData(connection, "tour_routes")) {
             connection.createStatement().executeUpdate(
                 """
-                INSERT INTO tour_routes (slug,name,short_description,full_description,route_type,starting_point,estimated_duration,travel_tips,distance_text,map_link,is_featured,status,sort_order) VALUES
-                ('historic-core-loop','Historic Core Loop','A complete first-time Intramuros walking circuit.','Covers Plaza Roma, Manila Cathedral, San Agustin Church, Casa Manila, and Baluarte de San Diego in one coherent path.','Heritage Walk','Plaza Roma','2.5 hours','Start early and carry water.','2.6 km','https://maps.google.com/?q=14.5906,120.9734',TRUE,'open',1),
-                ('fort-and-walls','Fort and Walls','Fort Santiago plus wallside viewpoints.','Begins at Fort Santiago and continues through wall promenades and river-facing segments for history-focused visitors.','Fortification Focus','Fort Santiago Gate','1.5 hours','Bring hat and sun protection.','1.8 km','https://maps.google.com/?q=14.5953,120.9701',TRUE,'open',2),
-                ('churches-and-plazas','Churches and Plazas','Faith and civic heritage route.','Connects Manila Cathedral, San Agustin Church, Plaza Roma, and nearby plazas with interpretation stops.','Culture & Faith','Manila Cathedral','1 hour 45 minutes','Respect mass schedules and quiet zones.','1.9 km','https://maps.google.com/?q=14.5911,120.9736',FALSE,'open',3)
+                INSERT INTO tour_routes (slug,name,short_description,full_description,route_type,starting_point,estimated_duration,travel_tips,distance_text,map_link,image_url,image_urls,is_featured,status,sort_order) VALUES
+                ('historic-core-loop','Historic Core Loop','A complete first-time Intramuros walking circuit.','Covers Plaza Roma, Manila Cathedral, San Agustin Church, Casa Manila, and Baluarte de San Diego in one coherent path.','Heritage Walk','Plaza Roma','2.5 hours','Start early and carry water.','2.6 km','https://maps.google.com/?q=14.5906,120.9734','https://images.unsplash.com/photo-1609142623923-2f5d6c9c0f7c','[\"https://images.unsplash.com/photo-1609142623923-2f5d6c9c0f7c\",\"https://images.unsplash.com/photo-1570789210967-2cac24afeb00\"]',TRUE,'open',1),
+                ('fort-and-walls','Fort and Walls','Fort Santiago plus wallside viewpoints.','Begins at Fort Santiago and continues through wall promenades and river-facing segments for history-focused visitors.','Fortification Focus','Fort Santiago Gate','1.5 hours','Bring hat and sun protection.','1.8 km','https://maps.google.com/?q=14.5953,120.9701','https://images.unsplash.com/photo-1570789210967-2cac24afeb00','[\"https://images.unsplash.com/photo-1570789210967-2cac24afeb00\",\"https://images.unsplash.com/photo-1609142623923-2f5d6c9c0f7c\"]',TRUE,'open',2),
+                ('churches-and-plazas','Churches and Plazas','Faith and civic heritage route.','Connects Manila Cathedral, San Agustin Church, Plaza Roma, and nearby plazas with interpretation stops.','Culture & Faith','Manila Cathedral','1 hour 45 minutes','Respect mass schedules and quiet zones.','1.9 km','https://maps.google.com/?q=14.5911,120.9736','https://images.unsplash.com/photo-1609142623923-2f5d6c9c0f7c','[\"https://images.unsplash.com/photo-1609142623923-2f5d6c9c0f7c\",\"https://images.unsplash.com/photo-1570789210967-2cac24afeb00\"]',FALSE,'open',3)
                 """.trimIndent()
             )
+        }
+
+        connection.createStatement().use { st ->
+            st.executeUpdate("UPDATE attractions SET image_path='https://upload.wikimedia.org/wikipedia/commons/6/6e/Fort_Santiago_Gate.jpg', image_urls='[\"https://upload.wikimedia.org/wikipedia/commons/6/6e/Fort_Santiago_Gate.jpg\",\"https://upload.wikimedia.org/wikipedia/commons/5/5f/Fort_Santiago_Manila.jpg\",\"https://upload.wikimedia.org/wikipedia/commons/3/3a/Fort_Santiago_Courtyard.jpg\"]' WHERE slug='fort-santiago'")
+            st.executeUpdate("UPDATE attractions SET image_path='https://upload.wikimedia.org/wikipedia/commons/5/5e/San_Agustin_Church_Manila.jpg', image_urls='[\"https://upload.wikimedia.org/wikipedia/commons/5/5e/San_Agustin_Church_Manila.jpg\",\"https://upload.wikimedia.org/wikipedia/commons/7/7f/San_Agustin_Church_Interior.jpg\",\"https://upload.wikimedia.org/wikipedia/commons/2/2c/San_Agustin_Ceiling.jpg\"]' WHERE slug='san-agustin-church'")
+            st.executeUpdate("UPDATE attractions SET image_path='https://upload.wikimedia.org/wikipedia/commons/1/1f/Casa_Manila.jpg', image_urls='[\"https://upload.wikimedia.org/wikipedia/commons/1/1f/Casa_Manila.jpg\",\"https://upload.wikimedia.org/wikipedia/commons/9/9c/Casa_Manila_Interior.jpg\",\"https://upload.wikimedia.org/wikipedia/commons/4/4f/Casa_Manila_Balcony.jpg\"]' WHERE slug='casa-manila'")
+            st.executeUpdate("UPDATE attractions SET image_path='https://upload.wikimedia.org/wikipedia/commons/6/6d/Manila_Cathedral_2018.jpg', image_urls='[\"https://upload.wikimedia.org/wikipedia/commons/6/6d/Manila_Cathedral_2018.jpg\",\"https://upload.wikimedia.org/wikipedia/commons/0/0c/Manila_Cathedral_Interior.jpg\",\"https://upload.wikimedia.org/wikipedia/commons/3/3c/Manila_Cathedral_Dome.jpg\"]' WHERE slug='manila-cathedral'")
+            st.executeUpdate("UPDATE attractions SET image_path='https://images.unsplash.com/photo-1596422846543-75c6fc197f07', image_urls='[\"https://images.unsplash.com/photo-1596422846543-75c6fc197f07\",\"https://images.unsplash.com/photo-1583391733956-6c78276477e2\"]' WHERE slug NOT IN ('fort-santiago','san-agustin-church','casa-manila','manila-cathedral')")
+
+            st.executeUpdate("UPDATE dining_places SET image_path='https://images.unsplash.com/photo-1555396273-367ea4eb4db5', image_urls='[\"https://images.unsplash.com/photo-1555396273-367ea4eb4db5\",\"https://images.unsplash.com/photo-1525610553991-2bede1a236e2\"]'")
+            st.executeUpdate("UPDATE local_services SET image_path='https://images.unsplash.com/photo-1588776814546-ec7e4b1c5c61', image_urls='[\"https://images.unsplash.com/photo-1588776814546-ec7e4b1c5c61\",\"https://images.unsplash.com/photo-1601597111158-2fceff292cdc\"]'")
+            st.executeUpdate("UPDATE tour_routes SET image_url='https://images.unsplash.com/photo-1609142623923-2f5d6c9c0f7c', image_urls='[\"https://images.unsplash.com/photo-1609142623923-2f5d6c9c0f7c\",\"https://images.unsplash.com/photo-1570789210967-2cac24afeb00\"]' WHERE image_url='' OR image_urls=''")
         }
     }
 

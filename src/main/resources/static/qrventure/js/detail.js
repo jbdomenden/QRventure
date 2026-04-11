@@ -48,6 +48,7 @@ async function loadDetail(endpoint, typeLabel) {
 function detailImages(item) {
   const fromList = Array.isArray(item.imageUrls) ? item.imageUrls : [];
   const merged = [...fromList];
+  if (typeof item.imageUrl === 'string' && item.imageUrl) merged.unshift(item.imageUrl);
   if (typeof item.imagePath === 'string' && item.imagePath) merged.unshift(item.imagePath);
 
   const clean = merged.filter((url, idx) => {
@@ -55,7 +56,7 @@ function detailImages(item) {
     const trimmed = url.trim();
     if (!trimmed) return false;
     if (!/^https?:\/\//i.test(trimmed)) return false;
-    return merged.indexOf(url) === idx;
+      return merged.findIndex(existing => (existing || '').trim() === trimmed) === idx;
   });
   return clean;
 }
@@ -68,13 +69,13 @@ function renderGallery(images, name) {
 
   return `<section class="detail-gallery" data-gallery>
     <div class="detail-gallery-main">
-      <img src="${images[0]}" alt="${name}" data-gallery-main onerror="this.onerror=null;this.src='${placeholder}'">
+      <img src="${images[0]}" alt="${name}" loading="lazy" data-gallery-main onerror="this.onerror=null;this.src='${placeholder}'">
       ${images.length > 1 ? `<button class="gallery-nav prev" type="button" data-gallery-prev aria-label="Previous image">‹</button>
       <button class="gallery-nav next" type="button" data-gallery-next aria-label="Next image">›</button>` : ''}
     </div>
     ${images.length > 1 ? `<div class="detail-thumbs">
       ${images.map((url, index) => `<button class="detail-thumb ${index === 0 ? 'active' : ''}" type="button" data-gallery-thumb="${index}">
-        <img src="${url}" alt="${name} thumbnail ${index + 1}" onerror="this.style.visibility='hidden'">
+        <img src="${url}" alt="${name} thumbnail ${index + 1}" loading="lazy" onerror="this.style.visibility='hidden'">
       </button>`).join('')}
     </div>` : ''}
   </section>`;

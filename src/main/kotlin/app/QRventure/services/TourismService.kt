@@ -2,6 +2,9 @@ package app.QRventure.services
 
 import app.QRventure.dto.*
 import app.QRventure.models.*
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.jsonArray
+import kotlinx.serialization.json.jsonPrimitive
 import java.sql.Connection
 import java.sql.ResultSet
 import java.sql.Statement
@@ -250,7 +253,9 @@ private fun ResultSet.toAttraction() = Attraction(
     fullDescription = getString("full_description"), category = getString("category"), historicalPeriod = getString("historical_period"),
     locationText = getString("location_text"), openingHours = getString("opening_hours"), entranceFee = getString("entrance_fee"),
     contactDetails = getString("contact_details"), visitorTips = getString("visitor_tips"), bestTimeToVisit = getString("best_time_to_visit"),
-    latitude = getDouble("latitude"), longitude = getDouble("longitude"), imagePath = getString("image_path"),
+    latitude = getDouble("latitude"), longitude = getDouble("longitude"),
+    imageUrl = primaryImageUrl(getString("image_urls"), getString("image_path")),
+    imagePath = getString("image_path"),
     imageUrls = parseImageUrls(getString("image_urls"), getString("image_path")),
     isFeatured = getBoolean("is_featured"), status = getString("status"), sortOrder = getInt("sort_order")
 )
@@ -260,7 +265,7 @@ private fun ResultSet.toDining() = DiningPlace(
     fullDescription = getString("full_description"), diningType = getString("dining_type"), cuisine = getString("cuisine"),
     locationText = getString("location_text"), openingHours = getString("opening_hours"), priceRange = getString("price_range"),
     contactDetails = getString("contact_details"), visitorNotes = getString("visitor_notes"), latitude = getDouble("latitude"),
-    longitude = getDouble("longitude"), imagePath = getString("image_path"),
+    longitude = getDouble("longitude"), imageUrl = primaryImageUrl(getString("image_urls"), getString("image_path")), imagePath = getString("image_path"),
     imageUrls = parseImageUrls(getString("image_urls"), getString("image_path")), isFeatured = getBoolean("is_featured"),
     status = getString("status"), sortOrder = getInt("sort_order")
 )
@@ -269,7 +274,8 @@ private fun ResultSet.toService() = LocalService(
     id = getInt("id"), slug = getString("slug"), name = getString("name"), shortDescription = getString("short_description"),
     fullDescription = getString("full_description"), serviceType = getString("service_type"), locationText = getString("location_text"),
     hours = getString("hours"), contactDetails = getString("contact_details"), visitorNotes = getString("visitor_notes"),
-    latitude = getDouble("latitude"), longitude = getDouble("longitude"), imagePath = getString("image_path"),
+    latitude = getDouble("latitude"), longitude = getDouble("longitude"),
+    imageUrl = primaryImageUrl(getString("image_urls"), getString("image_path")), imagePath = getString("image_path"),
     imageUrls = parseImageUrls(getString("image_urls"), getString("image_path")),
     status = getString("status"), sortOrder = getInt("sort_order")
 )
@@ -278,18 +284,27 @@ private fun ResultSet.toTourRoute() = TourRoute(
     id = getInt("id"), slug = getString("slug"), name = getString("name"), shortDescription = getString("short_description"),
     fullDescription = getString("full_description"), routeType = getString("route_type"), startingPoint = getString("starting_point"),
     estimatedDuration = getString("estimated_duration"), travelTips = getString("travel_tips"), distanceText = getString("distance_text"),
-    mapLink = getString("map_link"), isFeatured = getBoolean("is_featured"), status = getString("status"), sortOrder = getInt("sort_order")
+    mapLink = getString("map_link"),
+    imageUrl = primaryImageUrl(getString("image_urls"), getString("image_url")),
+    imageUrls = parseImageUrls(getString("image_urls"), getString("image_url")),
+    isFeatured = getBoolean("is_featured"), status = getString("status"), sortOrder = getInt("sort_order")
 )
 
 private fun parseImageUrls(raw: String?, fallbackImagePath: String?): List<String> {
-    val fromJson = raw?.trim().orEmpty()
-        .removePrefix("[")
-        .removeSuffix("]")
-        .split(",")
-        .map { it.trim().trim('"') }
-        .filter { it.startsWith("http://") || it.startsWith("https://") }
-    if (fromJson.isNotEmpty()) return fromJson
-
+    val fromJson = try {
+        val source = raw?.trim().orEmpty()
+        if (source.isBlank()) emptyList()
+        else Json.parseToJsonElement(source).jsonArray.mapNotNull { node ->
+            node.jsonPrimitive.content.trim().takeIf { it.startsWith("http://") || it.startsWith("https://") }
+        }
+    } catch (_: Exception) {
+        emptyList()
+    }
+    if (fromJson.isNotEmpty()) return fromJson.distinct()
     val fallback = fallbackImagePath?.trim().orEmpty()
     return if (fallback.startsWith("http://") || fallback.startsWith("https://")) listOf(fallback) else emptyList()
+}
+
+private fun primaryImageUrl(raw: String?, fallbackImagePath: String?): String {
+    return parseImageUrls(raw, fallbackImagePath).firstOrNull() ?: ""
 }
