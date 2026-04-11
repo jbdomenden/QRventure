@@ -176,6 +176,15 @@ main { padding-bottom: var(--space-6); }
 
 .card.visual-card { padding: 0; overflow: hidden; }
 .card-visual-body { padding: var(--space-4); }
+.card-image-empty {
+  min-height: 200px;
+  max-height: 220px;
+  display: grid;
+  place-items: center;
+  color: var(--ink-soft);
+  background: #f4ecdd;
+  border-bottom: 1px solid var(--line);
+}
 
 .card img {
   width: 100%;
@@ -280,6 +289,14 @@ main { padding-bottom: var(--space-6); }
   height: 100%;
   min-height: 240px;
   object-fit: cover;
+  border-bottom: 1px solid var(--line);
+}
+.detail-image-empty {
+  min-height: 240px;
+  display: grid;
+  place-items: center;
+  color: var(--ink-soft);
+  background: #f4ecdd;
   border-bottom: 1px solid var(--line);
 }
 .gallery-nav {

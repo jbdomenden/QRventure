@@ -62,14 +62,13 @@ function detailImages(item) {
 }
 
 function renderGallery(images, name) {
-  const placeholder = 'https://placehold.co/1200x675/e8dcc7/5f564d?text=No+Image+Available';
   if (!images.length) {
     return `<div class="detail-no-image">No gallery images available for this location.</div>`;
   }
 
   return `<section class="detail-gallery" data-gallery>
     <div class="detail-gallery-main">
-      <img src="${images[0]}" alt="${name}" loading="lazy" data-gallery-main onerror="this.onerror=null;this.src='${placeholder}'">
+      <img src="${images[0]}" alt="${name}" loading="lazy" data-gallery-main onerror="this.outerHTML='<div class=&quot;detail-image-empty&quot;>Image unavailable</div>'">
       ${images.length > 1 ? `<button class="gallery-nav prev" type="button" data-gallery-prev aria-label="Previous image">‹</button>
       <button class="gallery-nav next" type="button" data-gallery-next aria-label="Next image">›</button>` : ''}
     </div>
@@ -93,7 +92,9 @@ function initGallery(root) {
 
   const setIndex = (nextIndex) => {
     current = (nextIndex + sources.length) % sources.length;
-    main.src = sources[current];
+    main.outerHTML = `<img src="${sources[current]}" alt="${main.alt}" loading="lazy" data-gallery-main onerror="this.outerHTML='<div class=&quot;detail-image-empty&quot;>Image unavailable</div>'">`;
+    const refreshedMain = gallery.querySelector('[data-gallery-main]');
+    if (!refreshedMain) return;
     thumbs.forEach((thumb, idx) => thumb.classList.toggle('active', idx === current));
   };
 
