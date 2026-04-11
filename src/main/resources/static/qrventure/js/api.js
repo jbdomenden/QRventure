@@ -26,10 +26,11 @@ const cardHtml = (item, type) => {
         : `${item.routeType} · ${item.estimatedDuration}`;
 
   const desc = item.shortDescription || item.fullDescription || '';
-  const image = item.imagePath || '/qrventure/images/fort-santiago.svg';
+  const image = (item.imageUrl || '').trim();
+  const placeholder = 'https://placehold.co/1200x675/e8dcc7/5f564d?text=Image+Unavailable';
 
   return `<article class="card visual-card">
-    <img src="${image}" alt="${item.name}">
+    <img src="${image || placeholder}" alt="${item.name}" loading="lazy" onerror="this.onerror=null;this.src='${placeholder}'">
     <div class="card-visual-body">
       <h3 class="card-title">${item.name}</h3>
       <p class="meta">${meta}</p>

@@ -28,7 +28,9 @@ data class Attraction(
     val bestTimeToVisit: String,
     val latitude: Double,
     val longitude: Double,
+    val imageUrl: String,
     val imagePath: String,
+    val imageUrls: List<String> = emptyList(),
     val isFeatured: Boolean,
     val status: String,
     val sortOrder: Int
@@ -50,7 +52,9 @@ data class DiningPlace(
     val visitorNotes: String,
     val latitude: Double,
     val longitude: Double,
+    val imageUrl: String,
     val imagePath: String,
+    val imageUrls: List<String> = emptyList(),
     val isFeatured: Boolean,
     val status: String,
     val sortOrder: Int
@@ -70,7 +74,9 @@ data class LocalService(
     val visitorNotes: String,
     val latitude: Double,
     val longitude: Double,
+    val imageUrl: String,
     val imagePath: String,
+    val imageUrls: List<String> = emptyList(),
     val status: String,
     val sortOrder: Int
 )
@@ -88,6 +94,8 @@ data class TourRoute(
     val travelTips: String,
     val distanceText: String,
     val mapLink: String,
+    val imageUrl: String,
+    val imageUrls: List<String> = emptyList(),
     val isFeatured: Boolean,
     val status: String,
     val sortOrder: Int

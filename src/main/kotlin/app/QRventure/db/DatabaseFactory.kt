@@ -32,6 +32,7 @@ object DatabaseFactory {
                     latitude DOUBLE PRECISION NOT NULL,
                     longitude DOUBLE PRECISION NOT NULL,
                     image_path VARCHAR(240) NOT NULL,
+                    image_urls TEXT NOT NULL DEFAULT '',
                     is_featured BOOLEAN NOT NULL DEFAULT FALSE,
                     status VARCHAR(30) NOT NULL DEFAULT 'open',
                     sort_order INT NOT NULL DEFAULT 0
@@ -57,6 +58,7 @@ object DatabaseFactory {
                     latitude DOUBLE PRECISION NOT NULL,
                     longitude DOUBLE PRECISION NOT NULL,
                     image_path VARCHAR(240) NOT NULL,
+                    image_urls TEXT NOT NULL DEFAULT '',
                     is_featured BOOLEAN NOT NULL DEFAULT FALSE,
                     status VARCHAR(30) NOT NULL DEFAULT 'open',
                     sort_order INT NOT NULL DEFAULT 0
@@ -80,6 +82,7 @@ object DatabaseFactory {
                     latitude DOUBLE PRECISION NOT NULL,
                     longitude DOUBLE PRECISION NOT NULL,
                     image_path VARCHAR(240) NOT NULL,
+                    image_urls TEXT NOT NULL DEFAULT '',
                     status VARCHAR(30) NOT NULL DEFAULT 'open',
                     sort_order INT NOT NULL DEFAULT 0
                 )
@@ -100,6 +103,8 @@ object DatabaseFactory {
                     travel_tips TEXT NOT NULL DEFAULT '',
                     distance_text VARCHAR(80) NOT NULL DEFAULT '',
                     map_link TEXT NOT NULL DEFAULT '',
+                    image_url VARCHAR(500) NOT NULL DEFAULT '',
+                    image_urls TEXT NOT NULL DEFAULT '',
                     is_featured BOOLEAN NOT NULL DEFAULT FALSE,
                     status VARCHAR(30) NOT NULL DEFAULT 'open',
                     sort_order INT NOT NULL DEFAULT 0
@@ -111,6 +116,7 @@ object DatabaseFactory {
             st.execute("ALTER TABLE attractions ADD COLUMN IF NOT EXISTS historical_period VARCHAR(120) NOT NULL DEFAULT ''")
             st.execute("ALTER TABLE attractions ADD COLUMN IF NOT EXISTS visitor_tips TEXT NOT NULL DEFAULT ''")
             st.execute("ALTER TABLE attractions ADD COLUMN IF NOT EXISTS best_time_to_visit VARCHAR(120) NOT NULL DEFAULT ''")
+            st.execute("ALTER TABLE attractions ADD COLUMN IF NOT EXISTS image_urls TEXT NOT NULL DEFAULT ''")
             st.execute("ALTER TABLE attractions ADD COLUMN IF NOT EXISTS sort_order INT NOT NULL DEFAULT 0")
 
             st.execute("ALTER TABLE dining_places ADD COLUMN IF NOT EXISTS short_description TEXT NOT NULL DEFAULT ''")
@@ -118,6 +124,7 @@ object DatabaseFactory {
             st.execute("ALTER TABLE dining_places ADD COLUMN IF NOT EXISTS dining_type VARCHAR(100) NOT NULL DEFAULT ''")
             st.execute("ALTER TABLE dining_places ADD COLUMN IF NOT EXISTS cuisine VARCHAR(100) NOT NULL DEFAULT ''")
             st.execute("ALTER TABLE dining_places ADD COLUMN IF NOT EXISTS visitor_notes TEXT NOT NULL DEFAULT ''")
+            st.execute("ALTER TABLE dining_places ADD COLUMN IF NOT EXISTS image_urls TEXT NOT NULL DEFAULT ''")
             st.execute("ALTER TABLE dining_places ADD COLUMN IF NOT EXISTS status VARCHAR(30) NOT NULL DEFAULT 'open'")
             st.execute("ALTER TABLE dining_places ADD COLUMN IF NOT EXISTS sort_order INT NOT NULL DEFAULT 0")
             if (columnExists(connection, "dining_places", "description")) {
@@ -133,6 +140,7 @@ object DatabaseFactory {
             st.execute("ALTER TABLE local_services ADD COLUMN IF NOT EXISTS full_description TEXT NOT NULL DEFAULT ''")
             st.execute("ALTER TABLE local_services ADD COLUMN IF NOT EXISTS hours VARCHAR(150) NOT NULL DEFAULT ''")
             st.execute("ALTER TABLE local_services ADD COLUMN IF NOT EXISTS visitor_notes TEXT NOT NULL DEFAULT ''")
+            st.execute("ALTER TABLE local_services ADD COLUMN IF NOT EXISTS image_urls TEXT NOT NULL DEFAULT ''")
             st.execute("ALTER TABLE local_services ADD COLUMN IF NOT EXISTS status VARCHAR(30) NOT NULL DEFAULT 'open'")
             st.execute("ALTER TABLE local_services ADD COLUMN IF NOT EXISTS sort_order INT NOT NULL DEFAULT 0")
             if (columnExists(connection, "local_services", "description")) {
@@ -154,6 +162,8 @@ object DatabaseFactory {
             st.execute("ALTER TABLE tour_routes ADD COLUMN IF NOT EXISTS travel_tips TEXT NOT NULL DEFAULT ''")
             st.execute("ALTER TABLE tour_routes ADD COLUMN IF NOT EXISTS distance_text VARCHAR(80) NOT NULL DEFAULT ''")
             st.execute("ALTER TABLE tour_routes ADD COLUMN IF NOT EXISTS map_link TEXT NOT NULL DEFAULT ''")
+            st.execute("ALTER TABLE tour_routes ADD COLUMN IF NOT EXISTS image_url VARCHAR(500) NOT NULL DEFAULT ''")
+            st.execute("ALTER TABLE tour_routes ADD COLUMN IF NOT EXISTS image_urls TEXT NOT NULL DEFAULT ''")
             st.execute("ALTER TABLE tour_routes ADD COLUMN IF NOT EXISTS status VARCHAR(30) NOT NULL DEFAULT 'open'")
             st.execute("ALTER TABLE tour_routes ADD COLUMN IF NOT EXISTS sort_order INT NOT NULL DEFAULT 0")
             if (columnExists(connection, "tour_routes", "route_description")) {
@@ -174,6 +184,10 @@ object DatabaseFactory {
             }
 
             st.execute("CREATE TABLE IF NOT EXISTS admins (id SERIAL PRIMARY KEY, email VARCHAR(180) UNIQUE NOT NULL, password_hash VARCHAR(255) NOT NULL, role VARCHAR(40) NOT NULL DEFAULT 'super_admin', created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP)")
+            st.execute("UPDATE attractions SET image_urls = CONCAT('[\"', image_path, '\"]') WHERE image_urls = ''")
+            st.execute("UPDATE dining_places SET image_urls = CONCAT('[\"', image_path, '\"]') WHERE image_urls = ''")
+            st.execute("UPDATE local_services SET image_urls = CONCAT('[\"', image_path, '\"]') WHERE image_urls = ''")
+            st.execute("UPDATE tour_routes SET image_urls = CONCAT('[\"', image_url, '\"]') WHERE image_urls = '' AND image_url <> ''")
         }
     }
 
@@ -185,15 +199,15 @@ object DatabaseFactory {
             connection.createStatement().executeUpdate(
                 """
                 INSERT INTO attractions (slug,name,short_description,full_description,category,historical_period,location_text,opening_hours,entrance_fee,contact_details,visitor_tips,best_time_to_visit,latitude,longitude,image_path,is_featured,status,sort_order) VALUES
-                ('fort-santiago','Fort Santiago','Historic citadel and Rizal memorial destination.','Fort Santiago anchors many first-time Intramuros itineraries with bastions, river views, and galleries tracing the final days of Jose Rizal.','Historic Landmark','Spanish Colonial','Santa Clara Street, Intramuros','8:00 AM - 11:00 PM','PHP 75 regular / PHP 50 student','(02) 8527 2961','Bring water and sun protection; surfaces can be hot by noon.','Early morning or late afternoon',14.5953,120.9701,'/qrventure/images/fort-santiago.svg',TRUE,'open',1),
-                ('san-agustin-church','San Agustin Church','UNESCO-listed baroque church and museum.','Completed in 1607, San Agustin Church preserves rich liturgical art and museum archives that frame Manila''s layered colonial history.','Religious Heritage','Spanish Colonial','General Luna Street, Intramuros','8:00 AM - 5:00 PM','Church free / Museum PHP 200','(02) 8527 4064','Observe quiet etiquette during mass hours.','Weekday mornings',14.5898,120.9747,'/qrventure/images/san-agustin.svg',TRUE,'open',2),
-                ('casa-manila','Casa Manila','Recreation of a Spanish colonial bahay na bato.','Casa Manila curates period interiors, furniture, and social history to show elite domestic life in old Manila.','Museum','Spanish Colonial','Plaza San Luis Complex, Intramuros','9:00 AM - 6:00 PM','PHP 75','(02) 8527 4084','Pair your visit with nearby San Agustin Museum.','Mid-morning',14.5892,120.9749,'/qrventure/images/baluarte.svg',TRUE,'open',3),
-                ('baluarte-de-san-diego','Baluarte de San Diego','Gardened bastion with panoramic wall views.','Baluarte de San Diego combines restored masonry and landscaped grounds ideal for relaxed heritage walks and photo stops.','Historic Fortification','Spanish Colonial','Sta. Lucia Street, Intramuros','8:00 AM - 5:00 PM','PHP 75','(02) 8527 4084','Wear comfortable shoes for uneven stone paths.','Golden hour',14.5888,120.9753,'/qrventure/images/baluarte.svg',TRUE,'open',4),
-                ('manila-cathedral','Manila Cathedral','Neo-romanesque cathedral beside Plaza Roma.','The Manila Cathedral remains a spiritual and architectural focal point, rebuilt across centuries after earthquakes and war.','Religious Heritage','Spanish Colonial to Modern','Cabildo Street, Intramuros','7:30 AM - 5:30 PM','Free admission','(02) 8527 1796','Dress modestly when entering the church.','Late afternoon',14.5911,120.9736,'/qrventure/images/san-agustin.svg',TRUE,'open',5),
-                ('plaza-roma','Plaza Roma','Historic civic square in the heart of Intramuros.','Plaza Roma links major civic and religious landmarks, making it a natural orientation point for walking tours.','Plaza','Spanish Colonial','Cabildo Street, Intramuros','Open 24 hours','Free admission','Intramuros Administration','Use this as your meetup and starting point.','Sunset',14.5906,120.9734,'/qrventure/images/fort-santiago.svg',FALSE,'open',6),
-                ('puerta-del-parian','Puerta del Parian','Restored gate that once controlled trade access.','Puerta del Parian reflects Intramuros'' defensive planning and historical circulation between districts.','City Gate','Spanish Colonial','Muralla Street, Intramuros','Open 24 hours','Free admission','Intramuros Administration','Best seen with nearby wall walk segments.','Morning',14.5923,120.9718,'/qrventure/images/fort-santiago.svg',FALSE,'open',7),
-                ('puerta-real-gardens','Puerta Real Gardens','Landscaped leisure pocket beside the walls.','Puerta Real Gardens offers shaded benches and open lawns along southern Intramuros fortifications.','Park','Modern Heritage Zone','Real Street, Intramuros','6:00 AM - 10:00 PM','Free admission','Intramuros Administration','Good resting stop between route segments.','Late afternoon',14.5868,120.9758,'/qrventure/images/baluarte.svg',FALSE,'open',8),
-                ('memorare-manila-monument','Memorare Manila Monument','War memorial honoring civilian lives lost in 1945.','The monument offers an important reflective stop that contextualizes the Battle of Manila and post-war memory in the walled city.','Memorial','World War II','General Luna corner Anda, Intramuros','Open 24 hours','Free admission','Intramuros Administration','Maintain respectful silence in the area.','Early morning',14.5920,120.9719,'/qrventure/images/fort-santiago.svg',FALSE,'open',9)
+                ('fort-santiago','Fort Santiago','Historic citadel and Rizal memorial destination.','Fort Santiago anchors many first-time Intramuros itineraries with bastions, river views, and galleries tracing the final days of Jose Rizal.','Historic Landmark','Spanish Colonial','Santa Clara Street, Intramuros','8:00 AM - 11:00 PM','PHP 75 regular / PHP 50 student','(02) 8527 2961','Bring water and sun protection; surfaces can be hot by noon.','Early morning or late afternoon',14.5953,120.9701,'https://images.unsplash.com/photo-1467269204594-9661b134dd2b?auto=format&fit=crop&w=1200&q=80',TRUE,'open',1),
+                ('san-agustin-church','San Agustin Church','UNESCO-listed baroque church and museum.','Completed in 1607, San Agustin Church preserves rich liturgical art and museum archives that frame Manila''s layered colonial history.','Religious Heritage','Spanish Colonial','General Luna Street, Intramuros','8:00 AM - 5:00 PM','Church free / Museum PHP 200','(02) 8527 4064','Observe quiet etiquette during mass hours.','Weekday mornings',14.5898,120.9747,'https://images.unsplash.com/photo-1549893074-4bc8f8c6e39d?auto=format&fit=crop&w=1200&q=80',TRUE,'open',2),
+                ('casa-manila','Casa Manila','Recreation of a Spanish colonial bahay na bato.','Casa Manila curates period interiors, furniture, and social history to show elite domestic life in old Manila.','Museum','Spanish Colonial','Plaza San Luis Complex, Intramuros','9:00 AM - 6:00 PM','PHP 75','(02) 8527 4084','Pair your visit with nearby San Agustin Museum.','Mid-morning',14.5892,120.9749,'https://images.unsplash.com/photo-1473448912268-2022ce9509d8?auto=format&fit=crop&w=1200&q=80',TRUE,'open',3),
+                ('baluarte-de-san-diego','Baluarte de San Diego','Gardened bastion with panoramic wall views.','Baluarte de San Diego combines restored masonry and landscaped grounds ideal for relaxed heritage walks and photo stops.','Historic Fortification','Spanish Colonial','Sta. Lucia Street, Intramuros','8:00 AM - 5:00 PM','PHP 75','(02) 8527 4084','Wear comfortable shoes for uneven stone paths.','Golden hour',14.5888,120.9753,'https://images.unsplash.com/photo-1473448912268-2022ce9509d8?auto=format&fit=crop&w=1200&q=80',TRUE,'open',4),
+                ('manila-cathedral','Manila Cathedral','Neo-romanesque cathedral beside Plaza Roma.','The Manila Cathedral remains a spiritual and architectural focal point, rebuilt across centuries after earthquakes and war.','Religious Heritage','Spanish Colonial to Modern','Cabildo Street, Intramuros','7:30 AM - 5:30 PM','Free admission','(02) 8527 1796','Dress modestly when entering the church.','Late afternoon',14.5911,120.9736,'https://images.unsplash.com/photo-1549893074-4bc8f8c6e39d?auto=format&fit=crop&w=1200&q=80',TRUE,'open',5),
+                ('plaza-roma','Plaza Roma','Historic civic square in the heart of Intramuros.','Plaza Roma links major civic and religious landmarks, making it a natural orientation point for walking tours.','Plaza','Spanish Colonial','Cabildo Street, Intramuros','Open 24 hours','Free admission','Intramuros Administration','Use this as your meetup and starting point.','Sunset',14.5906,120.9734,'https://images.unsplash.com/photo-1467269204594-9661b134dd2b?auto=format&fit=crop&w=1200&q=80',FALSE,'open',6),
+                ('puerta-del-parian','Puerta del Parian','Restored gate that once controlled trade access.','Puerta del Parian reflects Intramuros'' defensive planning and historical circulation between districts.','City Gate','Spanish Colonial','Muralla Street, Intramuros','Open 24 hours','Free admission','Intramuros Administration','Best seen with nearby wall walk segments.','Morning',14.5923,120.9718,'https://images.unsplash.com/photo-1467269204594-9661b134dd2b?auto=format&fit=crop&w=1200&q=80',FALSE,'open',7),
+                ('puerta-real-gardens','Puerta Real Gardens','Landscaped leisure pocket beside the walls.','Puerta Real Gardens offers shaded benches and open lawns along southern Intramuros fortifications.','Park','Modern Heritage Zone','Real Street, Intramuros','6:00 AM - 10:00 PM','Free admission','Intramuros Administration','Good resting stop between route segments.','Late afternoon',14.5868,120.9758,'https://images.unsplash.com/photo-1473448912268-2022ce9509d8?auto=format&fit=crop&w=1200&q=80',FALSE,'open',8),
+                ('memorare-manila-monument','Memorare Manila Monument','War memorial honoring civilian lives lost in 1945.','The monument offers an important reflective stop that contextualizes the Battle of Manila and post-war memory in the walled city.','Memorial','World War II','General Luna corner Anda, Intramuros','Open 24 hours','Free admission','Intramuros Administration','Maintain respectful silence in the area.','Early morning',14.5920,120.9719,'https://images.unsplash.com/photo-1467269204594-9661b134dd2b?auto=format&fit=crop&w=1200&q=80',FALSE,'open',9)
                 """.trimIndent()
             )
         }
@@ -202,9 +216,9 @@ object DatabaseFactory {
             connection.createStatement().executeUpdate(
                 """
                 INSERT INTO dining_places (slug,name,short_description,full_description,dining_type,cuisine,location_text,opening_hours,price_range,contact_details,visitor_notes,latitude,longitude,image_path,is_featured,status,sort_order) VALUES
-                ('barbara-s-heritage','Barbara''s Heritage Restaurant','Heritage dining with cultural performances.','A popular heritage dining hall known for Filipino set menus and occasional cultural showcases near key plazas.','Restaurant','Filipino','General Luna Street, Intramuros','10:00 AM - 9:00 PM','PHP 500-1,200','(02) 8527 3893','Reserve ahead on weekends.',14.5894,120.9750,'/qrventure/images/dining-heritage.svg',TRUE,'open',1),
-                ('cafe-intramuros','Cafe Intramuros','Relaxed heritage cafe for breaks.','A quiet cafe for coffee, rice meals, and snacks close to museums and churches.','Cafe','Filipino Comfort','Plaza San Luis, Intramuros','8:00 AM - 8:00 PM','PHP 200-500','(02) 8536 1120','Good brunch stop before museum hours.',14.5899,120.9740,'/qrventure/images/dining-cafe.svg',TRUE,'open',2),
-                ('carta-filipina','Carta Filipina','Modern Filipino plates near major sites.','A contemporary Filipino dining room suitable for lunch and early dinner while exploring northern Intramuros.','Restaurant','Modern Filipino','Anda Street, Intramuros','10:30 AM - 9:30 PM','PHP 300-800','0917 100 2211','Try off-peak hours after 2 PM.',14.5949,120.9720,'/qrventure/images/dining-tapas.svg',FALSE,'open',3)
+                ('barbara-s-heritage','Barbara''s Heritage Restaurant','Heritage dining with cultural performances.','A popular heritage dining hall known for Filipino set menus and occasional cultural showcases near key plazas.','Restaurant','Filipino','General Luna Street, Intramuros','10:00 AM - 9:00 PM','PHP 500-1,200','(02) 8527 3893','Reserve ahead on weekends.',14.5894,120.9750,'https://images.unsplash.com/photo-1559339352-11d035aa65de?auto=format&fit=crop&w=1200&q=80',TRUE,'open',1),
+                ('cafe-intramuros','Cafe Intramuros','Relaxed heritage cafe for breaks.','A quiet cafe for coffee, rice meals, and snacks close to museums and churches.','Cafe','Filipino Comfort','Plaza San Luis, Intramuros','8:00 AM - 8:00 PM','PHP 200-500','(02) 8536 1120','Good brunch stop before museum hours.',14.5899,120.9740,'https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&w=1200&q=80',TRUE,'open',2),
+                ('carta-filipina','Carta Filipina','Modern Filipino plates near major sites.','A contemporary Filipino dining room suitable for lunch and early dinner while exploring northern Intramuros.','Restaurant','Modern Filipino','Anda Street, Intramuros','10:30 AM - 9:30 PM','PHP 300-800','0917 100 2211','Try off-peak hours after 2 PM.',14.5949,120.9720,'https://images.unsplash.com/photo-1473093295043-cdd812d0e601?auto=format&fit=crop&w=1200&q=80',FALSE,'open',3)
                 """.trimIndent()
             )
         }
@@ -213,9 +227,9 @@ object DatabaseFactory {
             connection.createStatement().executeUpdate(
                 """
                 INSERT INTO local_services (slug,name,short_description,full_description,service_type,location_text,hours,contact_details,visitor_notes,latitude,longitude,image_path,status,sort_order) VALUES
-                ('plaza-moriones-atm','Plaza Moriones ATM Cluster','ATM kiosks near major visitor flows.','Several bank ATM kiosks clustered near Plaza Moriones for quick cash access before route starts.','ATM','Plaza Moriones, Intramuros','24/7','Bank hotlines onsite','Withdraw small bills for transport and small vendors.',14.5957,120.9698,'/qrventure/images/service-atm.svg','open',1),
-                ('intramuros-info-center','Intramuros Information Center','Visitor orientation and maps.','Primary information desk for maps, updates, and event advisories before beginning walking routes.','Info Center','Fort Santiago Gate Area','8:00 AM - 6:00 PM','(02) 8527 3120','Ask for closures during heritage events.',14.5950,120.9709,'/qrventure/images/service-info.svg','open',2),
-                ('intra-police-assist','Intramuros Police Assistance Desk','Tourist safety assistance point.','Assistance desk for incident reporting, lost and found, and safety-related concerns in the district.','Police','Anda Circle, Intramuros','24/7','PNP Hotline 911','Keep emergency contacts ready.',14.5942,120.9723,'/qrventure/images/service-firstaid.svg','open',3)
+                ('plaza-moriones-atm','Plaza Moriones ATM Cluster','ATM kiosks near major visitor flows.','Several bank ATM kiosks clustered near Plaza Moriones for quick cash access before route starts.','ATM','Plaza Moriones, Intramuros','24/7','Bank hotlines onsite','Withdraw small bills for transport and small vendors.',14.5957,120.9698,'https://images.unsplash.com/photo-1518544866330-95a2b5f22925?auto=format&fit=crop&w=1200&q=80','open',1),
+                ('intramuros-info-center','Intramuros Information Center','Visitor orientation and maps.','Primary information desk for maps, updates, and event advisories before beginning walking routes.','Info Center','Fort Santiago Gate Area','8:00 AM - 6:00 PM','(02) 8527 3120','Ask for closures during heritage events.',14.5950,120.9709,'https://images.unsplash.com/photo-1521791136064-7986c2920216?auto=format&fit=crop&w=1200&q=80','open',2),
+                ('intra-police-assist','Intramuros Police Assistance Desk','Tourist safety assistance point.','Assistance desk for incident reporting, lost and found, and safety-related concerns in the district.','Police','Anda Circle, Intramuros','24/7','PNP Hotline 911','Keep emergency contacts ready.',14.5942,120.9723,'https://images.unsplash.com/photo-1584515933487-779824d29309?auto=format&fit=crop&w=1200&q=80','open',3)
                 """.trimIndent()
             )
         }
@@ -223,12 +237,24 @@ object DatabaseFactory {
         if (!tableHasData(connection, "tour_routes")) {
             connection.createStatement().executeUpdate(
                 """
-                INSERT INTO tour_routes (slug,name,short_description,full_description,route_type,starting_point,estimated_duration,travel_tips,distance_text,map_link,is_featured,status,sort_order) VALUES
-                ('historic-core-loop','Historic Core Loop','A complete first-time Intramuros walking circuit.','Covers Plaza Roma, Manila Cathedral, San Agustin Church, Casa Manila, and Baluarte de San Diego in one coherent path.','Heritage Walk','Plaza Roma','2.5 hours','Start early and carry water.','2.6 km','https://maps.google.com/?q=14.5906,120.9734',TRUE,'open',1),
-                ('fort-and-walls','Fort and Walls','Fort Santiago plus wallside viewpoints.','Begins at Fort Santiago and continues through wall promenades and river-facing segments for history-focused visitors.','Fortification Focus','Fort Santiago Gate','1.5 hours','Bring hat and sun protection.','1.8 km','https://maps.google.com/?q=14.5953,120.9701',TRUE,'open',2),
-                ('churches-and-plazas','Churches and Plazas','Faith and civic heritage route.','Connects Manila Cathedral, San Agustin Church, Plaza Roma, and nearby plazas with interpretation stops.','Culture & Faith','Manila Cathedral','1 hour 45 minutes','Respect mass schedules and quiet zones.','1.9 km','https://maps.google.com/?q=14.5911,120.9736',FALSE,'open',3)
+                INSERT INTO tour_routes (slug,name,short_description,full_description,route_type,starting_point,estimated_duration,travel_tips,distance_text,map_link,image_url,image_urls,is_featured,status,sort_order) VALUES
+                ('historic-core-loop','Historic Core Loop','A complete first-time Intramuros walking circuit.','Covers Plaza Roma, Manila Cathedral, San Agustin Church, Casa Manila, and Baluarte de San Diego in one coherent path.','Heritage Walk','Plaza Roma','2.5 hours','Start early and carry water.','2.6 km','https://maps.google.com/?q=14.5906,120.9734','https://images.unsplash.com/photo-1609142623923-2f5d6c9c0f7c','[\"https://images.unsplash.com/photo-1609142623923-2f5d6c9c0f7c\",\"https://images.unsplash.com/photo-1570789210967-2cac24afeb00\"]',TRUE,'open',1),
+                ('fort-and-walls','Fort and Walls','Fort Santiago plus wallside viewpoints.','Begins at Fort Santiago and continues through wall promenades and river-facing segments for history-focused visitors.','Fortification Focus','Fort Santiago Gate','1.5 hours','Bring hat and sun protection.','1.8 km','https://maps.google.com/?q=14.5953,120.9701','https://images.unsplash.com/photo-1570789210967-2cac24afeb00','[\"https://images.unsplash.com/photo-1570789210967-2cac24afeb00\",\"https://images.unsplash.com/photo-1609142623923-2f5d6c9c0f7c\"]',TRUE,'open',2),
+                ('churches-and-plazas','Churches and Plazas','Faith and civic heritage route.','Connects Manila Cathedral, San Agustin Church, Plaza Roma, and nearby plazas with interpretation stops.','Culture & Faith','Manila Cathedral','1 hour 45 minutes','Respect mass schedules and quiet zones.','1.9 km','https://maps.google.com/?q=14.5911,120.9736','https://images.unsplash.com/photo-1609142623923-2f5d6c9c0f7c','[\"https://images.unsplash.com/photo-1609142623923-2f5d6c9c0f7c\",\"https://images.unsplash.com/photo-1570789210967-2cac24afeb00\"]',FALSE,'open',3)
                 """.trimIndent()
             )
+        }
+
+        connection.createStatement().use { st ->
+            st.executeUpdate("UPDATE attractions SET image_path='https://upload.wikimedia.org/wikipedia/commons/6/6e/Fort_Santiago_Gate.jpg', image_urls='[\"https://upload.wikimedia.org/wikipedia/commons/6/6e/Fort_Santiago_Gate.jpg\",\"https://upload.wikimedia.org/wikipedia/commons/5/5f/Fort_Santiago_Manila.jpg\",\"https://upload.wikimedia.org/wikipedia/commons/3/3a/Fort_Santiago_Courtyard.jpg\"]' WHERE slug='fort-santiago'")
+            st.executeUpdate("UPDATE attractions SET image_path='https://upload.wikimedia.org/wikipedia/commons/5/5e/San_Agustin_Church_Manila.jpg', image_urls='[\"https://upload.wikimedia.org/wikipedia/commons/5/5e/San_Agustin_Church_Manila.jpg\",\"https://upload.wikimedia.org/wikipedia/commons/7/7f/San_Agustin_Church_Interior.jpg\",\"https://upload.wikimedia.org/wikipedia/commons/2/2c/San_Agustin_Ceiling.jpg\"]' WHERE slug='san-agustin-church'")
+            st.executeUpdate("UPDATE attractions SET image_path='https://upload.wikimedia.org/wikipedia/commons/1/1f/Casa_Manila.jpg', image_urls='[\"https://upload.wikimedia.org/wikipedia/commons/1/1f/Casa_Manila.jpg\",\"https://upload.wikimedia.org/wikipedia/commons/9/9c/Casa_Manila_Interior.jpg\",\"https://upload.wikimedia.org/wikipedia/commons/4/4f/Casa_Manila_Balcony.jpg\"]' WHERE slug='casa-manila'")
+            st.executeUpdate("UPDATE attractions SET image_path='https://upload.wikimedia.org/wikipedia/commons/6/6d/Manila_Cathedral_2018.jpg', image_urls='[\"https://upload.wikimedia.org/wikipedia/commons/6/6d/Manila_Cathedral_2018.jpg\",\"https://upload.wikimedia.org/wikipedia/commons/0/0c/Manila_Cathedral_Interior.jpg\",\"https://upload.wikimedia.org/wikipedia/commons/3/3c/Manila_Cathedral_Dome.jpg\"]' WHERE slug='manila-cathedral'")
+            st.executeUpdate("UPDATE attractions SET image_path='https://images.unsplash.com/photo-1596422846543-75c6fc197f07', image_urls='[\"https://images.unsplash.com/photo-1596422846543-75c6fc197f07\",\"https://images.unsplash.com/photo-1583391733956-6c78276477e2\"]' WHERE slug NOT IN ('fort-santiago','san-agustin-church','casa-manila','manila-cathedral')")
+
+            st.executeUpdate("UPDATE dining_places SET image_path='https://images.unsplash.com/photo-1555396273-367ea4eb4db5', image_urls='[\"https://images.unsplash.com/photo-1555396273-367ea4eb4db5\",\"https://images.unsplash.com/photo-1525610553991-2bede1a236e2\"]'")
+            st.executeUpdate("UPDATE local_services SET image_path='https://images.unsplash.com/photo-1588776814546-ec7e4b1c5c61', image_urls='[\"https://images.unsplash.com/photo-1588776814546-ec7e4b1c5c61\",\"https://images.unsplash.com/photo-1601597111158-2fceff292cdc\"]'")
+            st.executeUpdate("UPDATE tour_routes SET image_url='https://images.unsplash.com/photo-1609142623923-2f5d6c9c0f7c', image_urls='[\"https://images.unsplash.com/photo-1609142623923-2f5d6c9c0f7c\",\"https://images.unsplash.com/photo-1570789210967-2cac24afeb00\"]' WHERE image_url='' OR image_urls=''")
         }
     }
 
