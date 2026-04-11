@@ -7,9 +7,10 @@
   <link rel="stylesheet" href="/qrventure/css/styles.css" />
 </head>
 <body>
-<header class="top-nav"><div class="container nav-inner"><a class="brand" href="/">QRventure Intramuros</a><nav class="nav-links"><a href="/qrventure/routes">Routes</a><a href="/qrventure/navigation.html">Search</a></nav></div></header>
-<main class="container section"><a class="btn btn-secondary" href="/qrventure/routes">← Back to routes</a><div id="detail" class="section"></div></main>
+<div data-public-header data-header-title="Route Details" data-back-fallback="/qrventure/routes"></div>
+<main class="container section"><div id="detail" class="section"></div></main>
 <footer class="footer"><div class="container">Curated routes for Intramuros visitors.</div></footer>
+<script src="/qrventure/js/public-header.js"></script>
 <script src="/qrventure/js/api.js"></script>
 <script src="/qrventure/js/detail.js"></script>
 <script>loadDetail('/api/routes','Route');</script>
