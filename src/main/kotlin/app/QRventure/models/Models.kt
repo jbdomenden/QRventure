@@ -7,6 +7,7 @@ data class Attraction(
     val id: Int,
     val slug: String,
     val name: String,
+    val alternateNames: List<String> = emptyList(),
     val shortDescription: String,
     val fullDescription: String,
     val category: String,
