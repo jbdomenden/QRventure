@@ -29,6 +29,7 @@ data class Attraction(
     val latitude: Double,
     val longitude: Double,
     val imagePath: String,
+    val imageUrls: List<String> = emptyList(),
     val isFeatured: Boolean,
     val status: String,
     val sortOrder: Int
@@ -51,6 +52,7 @@ data class DiningPlace(
     val latitude: Double,
     val longitude: Double,
     val imagePath: String,
+    val imageUrls: List<String> = emptyList(),
     val isFeatured: Boolean,
     val status: String,
     val sortOrder: Int
@@ -71,6 +73,7 @@ data class LocalService(
     val latitude: Double,
     val longitude: Double,
     val imagePath: String,
+    val imageUrls: List<String> = emptyList(),
     val status: String,
     val sortOrder: Int
 )

@@ -7,14 +7,7 @@
   <link rel="stylesheet" href="/qrventure/css/styles.css">
 </head>
 <body>
-<header class="top-nav">
-  <div class="container nav-inner">
-    <a class="brand" href="/">QRventure Intramuros</a>
-    <nav class="nav-links">
-      <a href="/qrventure/attractions">Attractions</a><a href="/qrventure/services">Services</a><a href="/qrventure/routes">Routes</a>
-    </nav>
-  </div>
-</header>
+<div data-public-header data-header-title="Visitor Services" data-back-fallback="/qrventure/"></div>
 <main class="container">
   <section class="hero section">
     <div class="hero-eyebrow">Practical Help</div>
@@ -29,7 +22,7 @@
   <section class="section"><div id="items"></div></section>
 </main>
 <footer class="footer"><div class="container">Visitor services are shown with location and contact context.</div></footer>
-<script src="/qrventure/js/api.js"></script><script src="/qrventure/js/listing.js"></script>
+<script src="/qrventure/js/public-header.js"></script><script src="/qrventure/js/api.js"></script><script src="/qrventure/js/listing.js"></script>
 <script>loadListing({target:'#items',endpoint:'/api/services',type:'services',empty:'No services found.',filters:[{url:'type',api:'type'}]})</script>
 </body>
 </html>
