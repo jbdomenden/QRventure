@@ -5,7 +5,7 @@ import app.QRventure.auth.AdminSession
 import app.QRventure.auth.loadAdminCredentials
 import app.QRventure.auth.verifyPassword
 import app.QRventure.dto.*
-import app.QRventure.service.TourismService
+import app.QRventure.services.TourismService
 import io.ktor.http.*
 import io.ktor.http.content.PartData
 import io.ktor.http.content.forEachPart
@@ -15,6 +15,7 @@ import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.server.sessions.*
+import io.ktor.utils.io.jvm.javaio.toInputStream
 import kotlinx.serialization.Serializable
 import java.nio.file.Files
 import java.nio.file.Paths
@@ -32,7 +33,7 @@ fun Application.configureAdminRoutes(connection: java.sql.Connection?) {
 
     routing {
         get("/admin") {
-            val destination = if (call.sessions.get<AdminSession>() == null) "/admin/login" else "/qrventure/admin/index.html"
+            val destination = if (call.sessions.get<AdminSession>() == null) "/admin/login" else "/qrventure/admin/dashboard.html"
             call.respondRedirect(destination, permanent = false)
         }
 
@@ -272,11 +273,13 @@ fun Application.configureAdminRoutes(connection: java.sql.Connection?) {
     }
 }
 
-private suspend inline fun <reified T> ApplicationCall.parseBody(): T? =
-    runCatching { this.receive<T>() }.getOrElse {
-        this.respond(HttpStatusCode.BadRequest, ErrorResponse("Invalid request body."))
+private suspend inline fun <reified T : Any> ApplicationCall.parseBody(): T? {
+    val call = this
+    return runCatching { call.receive<T>() }.getOrElse {
+        call.respond(HttpStatusCode.BadRequest, ErrorResponse("Invalid request body."))
         null
     }
+}
 
 private suspend fun ApplicationCall.requireAdminSession(): AdminSession? {
     val session = sessions.get<AdminSession>()
@@ -301,7 +304,7 @@ private fun saveUpload(filePart: PartData.FileItem): Result<String> = runCatchin
     val targetFile = uploadsDir.resolve(generatedName)
 
     try {
-        filePart.streamProvider().use { input ->
+        filePart.provider().toInputStream().use { input ->
             Files.newOutputStream(targetFile).use { output ->
                 val buffer = ByteArray(8 * 1024)
                 var total = 0L
