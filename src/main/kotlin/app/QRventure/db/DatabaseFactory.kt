@@ -279,29 +279,162 @@ object DatabaseFactory {
             st.executeUpdate("INSERT INTO attractions (slug,name,short_description,full_description,category,historical_period,location_text,opening_hours,entrance_fee,contact_details,visitor_tips,best_time_to_visit,latitude,longitude,image_path,is_featured,status,sort_order) SELECT 'lyceum-of-the-philippines-university','Lyceum of the Philippines University','University campus embedded in Intramuros heritage district.','Lyceum of the Philippines University in Intramuros represents the district''s continuing role as a center of education and civic life.','Educational Landmark','Contemporary in Historic District','Muralla St, Intramuros','Campus hours','N/A','Lyceum of the Philippines University','Observe campus guidelines while passing through nearby streets.','Weekdays',14.5895,120.9728,'',FALSE,'open',26 WHERE NOT EXISTS (SELECT 1 FROM attractions WHERE slug='lyceum-of-the-philippines-university')")
             st.executeUpdate("INSERT INTO attractions (slug,name,short_description,full_description,category,historical_period,location_text,opening_hours,entrance_fee,contact_details,visitor_tips,best_time_to_visit,latitude,longitude,image_path,is_featured,status,sort_order) SELECT 'mapua-university','Mapua University','Historic Intramuros-based university campus landmark.','Mapua University contributes to Intramuros'' educational heritage and remains a recognizable public-interest location in the district.','Educational Landmark','Contemporary in Historic District','Muralla St, Intramuros','Campus hours','N/A','Mapua University','Be mindful of student traffic and campus boundaries.','Weekdays',14.5890,120.9732,'',FALSE,'open',27 WHERE NOT EXISTS (SELECT 1 FROM attractions WHERE slug='mapua-university')")
 
-            st.executeUpdate("UPDATE attractions SET name='Fort Santiago', category='Fortification', image_path='https://commons.wikimedia.org/wiki/Special:FilePath/Fort%20Santiago%20Gate.jpg', image_urls='[\"https://commons.wikimedia.org/wiki/Special:FilePath/Fort%20Santiago%20Gate.jpg\",\"https://commons.wikimedia.org/wiki/Special:FilePath/Fort%20Santiago%2C%20Intramuros.JPG\"]' WHERE slug='fort-santiago'")
-            st.executeUpdate("UPDATE attractions SET name='Church of San Agustin', category='Church', image_path='https://commons.wikimedia.org/wiki/Special:FilePath/San_Agustin_Church_Manila.jpg', image_urls='[\"https://commons.wikimedia.org/wiki/Special:FilePath/San_Agustin_Church_Manila.jpg\",\"https://commons.wikimedia.org/wiki/Special:FilePath/San_Agustin_Church_%28Manila%29.jpg\"]' WHERE slug='san-agustin-church'")
-            st.executeUpdate("UPDATE attractions SET name='Casa Manila Museum', category='Museum', image_path='https://commons.wikimedia.org/wiki/Special:FilePath/Casa_Manila.jpg', image_urls='[\"https://commons.wikimedia.org/wiki/Special:FilePath/Casa_Manila.jpg\",\"https://commons.wikimedia.org/wiki/Special:FilePath/CasaManilajf1591_12.JPG\"]' WHERE slug='casa-manila'")
-            st.executeUpdate("UPDATE attractions SET name='Cathedral of Manila', category='Church', image_path='https://commons.wikimedia.org/wiki/Special:FilePath/Minor_Basilica_and_Metropolitan_Cathedral_of_the_Immaculate_Conception.jpg', image_urls='[\"https://commons.wikimedia.org/wiki/Special:FilePath/Minor_Basilica_and_Metropolitan_Cathedral_of_the_Immaculate_Conception.jpg\",\"https://commons.wikimedia.org/wiki/Special:FilePath/Manila_Cathedral_2018.jpg\"]' WHERE slug='manila-cathedral'")
-            st.executeUpdate("UPDATE attractions SET image_path='https://commons.wikimedia.org/wiki/Special:FilePath/Baluarte_de_San_Diego_Gardens.jpg', image_urls='[\"https://commons.wikimedia.org/wiki/Special:FilePath/Baluarte_de_San_Diego_Gardens.jpg\",\"https://commons.wikimedia.org/wiki/Special:FilePath/Baluarte_de_San_Diego%2C_Intramuros%2C_Manila.jpg\"]' WHERE slug='baluarte-de-san-diego'")
-            st.executeUpdate("UPDATE attractions SET image_path='https://commons.wikimedia.org/wiki/Special:FilePath/San_Agustin_Museum.jpg', image_urls='[\"https://commons.wikimedia.org/wiki/Special:FilePath/San_Agustin_Museum.jpg\"]' WHERE slug='san-agustin-museum'")
-            st.executeUpdate("UPDATE attractions SET name='Intramuros Walls Walk', category='Experience', image_path='https://commons.wikimedia.org/wiki/Special:FilePath/Manila%2C_Intramuros_walls%2C_Philippines.jpg', image_urls='[\"https://commons.wikimedia.org/wiki/Special:FilePath/Manila%2C_Intramuros_walls%2C_Philippines.jpg\"]' WHERE slug='intramuros-walls-walk'")
-            st.executeUpdate("UPDATE attractions SET name='Plaza San Luis', category='Cultural Site', image_path='', image_urls='[]' WHERE slug='plaza-san-luis-complex'")
-            st.executeUpdate("UPDATE attractions SET name='Puerta Parian', category='Gate', image_path='', image_urls='[]' WHERE slug='puerta-del-parian'")
-            st.executeUpdate("UPDATE attractions SET name='Plaza Roma', category='Plaza', image_path='https://commons.wikimedia.org/wiki/Special:FilePath/Plaza_de_Roma%2C_Intramuros%2C_Manila.jpg', image_urls='[\"https://commons.wikimedia.org/wiki/Special:FilePath/Plaza_de_Roma%2C_Intramuros%2C_Manila.jpg\"]' WHERE slug='plaza-roma'")
-            st.executeUpdate("UPDATE attractions SET image_path='https://commons.wikimedia.org/wiki/Special:FilePath/Puerta_Real_Gardens.jpg', image_urls='[\"https://commons.wikimedia.org/wiki/Special:FilePath/Puerta_Real_Gardens.jpg\"]' WHERE slug='puerta-real-gardens'")
-            st.executeUpdate("UPDATE attractions SET image_path='https://commons.wikimedia.org/wiki/Special:FilePath/Memorare-Manila-1945.jpg', image_urls='[\"https://commons.wikimedia.org/wiki/Special:FilePath/Memorare-Manila-1945.jpg\"]' WHERE slug='memorare-manila-monument'")
-            st.executeUpdate("UPDATE attractions SET image_path='', image_urls='[]' WHERE slug NOT IN ('fort-santiago','san-agustin-church','casa-manila','manila-cathedral','baluarte-de-san-diego','puerta-del-parian','puerta-real-gardens','memorare-manila-monument','san-agustin-museum','intramuros-walls-walk','plaza-san-luis-complex','museo-de-intramuros','centro-de-turismo-intramuros','museo-ni-rizal-fort-santiago','fort-santiago-dungeons','puerta-de-isabel-ii','puerta-de-santa-lucia','puerta-real-de-bagumbayan','plaza-de-armas','plaza-mexico','plaza-moriones','bahay-tsinoy','destileria-limtuaco-and-co-museum','colegio-de-san-juan-de-letran','lyceum-of-the-philippines-university','mapua-university')")
+            st.executeUpdate(
+                "UPDATE attractions " +
+                    "SET name='Fort Santiago', " +
+                    "category='Fortification', " +
+                    "image_path='https://commons.wikimedia.org/wiki/Special:FilePath/Fort%20Santiago%20Gate.jpg', " +
+                    "image_urls='[\"https://commons.wikimedia.org/wiki/Special:FilePath/Fort%20Santiago%20Gate.jpg\",\"https://commons.wikimedia.org/wiki/Special:FilePath/Fort%20Santiago%2C%20Intramuros.JPG\"]' " +
+                    "WHERE slug='fort-santiago'"
+            )
+            st.executeUpdate(
+                "UPDATE attractions " +
+                    "SET name='Church of San Agustin', " +
+                    "category='Church', " +
+                    "image_path='https://commons.wikimedia.org/wiki/Special:FilePath/San_Agustin_Church_Manila.jpg', " +
+                    "image_urls='[\"https://commons.wikimedia.org/wiki/Special:FilePath/San_Agustin_Church_Manila.jpg\",\"https://commons.wikimedia.org/wiki/Special:FilePath/San_Agustin_Church_%28Manila%29.jpg\"]' " +
+                    "WHERE slug='san-agustin-church'"
+            )
+            st.executeUpdate(
+                "UPDATE attractions " +
+                    "SET name='Casa Manila Museum', " +
+                    "category='Museum', " +
+                    "image_path='https://commons.wikimedia.org/wiki/Special:FilePath/Casa_Manila.jpg', " +
+                    "image_urls='[\"https://commons.wikimedia.org/wiki/Special:FilePath/Casa_Manila.jpg\",\"https://commons.wikimedia.org/wiki/Special:FilePath/CasaManilajf1591_12.JPG\"]' " +
+                    "WHERE slug='casa-manila'"
+            )
+            st.executeUpdate(
+                "UPDATE attractions " +
+                    "SET name='Cathedral of Manila', " +
+                    "category='Church', " +
+                    "image_path='https://commons.wikimedia.org/wiki/Special:FilePath/Minor_Basilica_and_Metropolitan_Cathedral_of_the_Immaculate_Conception.jpg', " +
+                    "image_urls='[\"https://commons.wikimedia.org/wiki/Special:FilePath/Minor_Basilica_and_Metropolitan_Cathedral_of_the_Immaculate_Conception.jpg\",\"https://commons.wikimedia.org/wiki/Special:FilePath/Manila_Cathedral_2018.jpg\"]' " +
+                    "WHERE slug='manila-cathedral'"
+            )
+            st.executeUpdate(
+                "UPDATE attractions " +
+                    "SET image_path='https://commons.wikimedia.org/wiki/Special:FilePath/Baluarte_de_San_Diego_Gardens.jpg', " +
+                    "image_urls='[\"https://commons.wikimedia.org/wiki/Special:FilePath/Baluarte_de_San_Diego_Gardens.jpg\",\"https://commons.wikimedia.org/wiki/Special:FilePath/Baluarte_de_San_Diego%2C_Intramuros%2C_Manila.jpg\"]' " +
+                    "WHERE slug='baluarte-de-san-diego'"
+            )
+            st.executeUpdate(
+                "UPDATE attractions " +
+                    "SET image_path='https://commons.wikimedia.org/wiki/Special:FilePath/San_Agustin_Museum.jpg', " +
+                    "image_urls='[\"https://commons.wikimedia.org/wiki/Special:FilePath/San_Agustin_Museum.jpg\"]' " +
+                    "WHERE slug='san-agustin-museum'"
+            )
+            st.executeUpdate(
+                "UPDATE attractions " +
+                    "SET name='Intramuros Walls Walk', " +
+                    "category='Experience', " +
+                    "image_path='https://commons.wikimedia.org/wiki/Special:FilePath/Manila%2C_Intramuros_walls%2C_Philippines.jpg', " +
+                    "image_urls='[\"https://commons.wikimedia.org/wiki/Special:FilePath/Manila%2C_Intramuros_walls%2C_Philippines.jpg\"]' " +
+                    "WHERE slug='intramuros-walls-walk'"
+            )
+            st.executeUpdate(
+                "UPDATE attractions " +
+                    "SET name='Plaza San Luis', " +
+                    "category='Cultural Site', " +
+                    "image_path='', " +
+                    "image_urls='[]' " +
+                    "WHERE slug='plaza-san-luis-complex'"
+            )
+            st.executeUpdate(
+                "UPDATE attractions " +
+                    "SET name='Puerta Parian', " +
+                    "category='Gate', " +
+                    "image_path='', " +
+                    "image_urls='[]' " +
+                    "WHERE slug='puerta-del-parian'"
+            )
+            st.executeUpdate(
+                "UPDATE attractions " +
+                    "SET name='Plaza Roma', " +
+                    "category='Plaza', " +
+                    "image_path='https://commons.wikimedia.org/wiki/Special:FilePath/Plaza_de_Roma%2C_Intramuros%2C_Manila.jpg', " +
+                    "image_urls='[\"https://commons.wikimedia.org/wiki/Special:FilePath/Plaza_de_Roma%2C_Intramuros%2C_Manila.jpg\"]' " +
+                    "WHERE slug='plaza-roma'"
+            )
+            st.executeUpdate(
+                "UPDATE attractions " +
+                    "SET image_path='https://commons.wikimedia.org/wiki/Special:FilePath/Puerta_Real_Gardens.jpg', " +
+                    "image_urls='[\"https://commons.wikimedia.org/wiki/Special:FilePath/Puerta_Real_Gardens.jpg\"]' " +
+                    "WHERE slug='puerta-real-gardens'"
+            )
+            st.executeUpdate(
+                "UPDATE attractions " +
+                    "SET image_path='https://commons.wikimedia.org/wiki/Special:FilePath/Memorare-Manila-1945.jpg', " +
+                    "image_urls='[\"https://commons.wikimedia.org/wiki/Special:FilePath/Memorare-Manila-1945.jpg\"]' " +
+                    "WHERE slug='memorare-manila-monument'"
+            )
+            st.executeUpdate(
+                "UPDATE attractions " +
+                    "SET image_path='', " +
+                    "image_urls='[]' " +
+                    "WHERE slug NOT IN ('fort-santiago','san-agustin-church','casa-manila','manila-cathedral','baluarte-de-san-diego','puerta-del-parian','puerta-real-gardens','memorare-manila-monument','san-agustin-museum','intramuros-walls-walk','plaza-san-luis-complex','museo-de-intramuros','centro-de-turismo-intramuros','museo-ni-rizal-fort-santiago','fort-santiago-dungeons','puerta-de-isabel-ii','puerta-de-santa-lucia','puerta-real-de-bagumbayan','plaza-de-armas','plaza-mexico','plaza-moriones','bahay-tsinoy','destileria-limtuaco-and-co-museum','colegio-de-san-juan-de-letran','lyceum-of-the-philippines-university','mapua-university')"
+            )
 
-            st.executeUpdate("UPDATE dining_places SET image_path='https://commons.wikimedia.org/wiki/Special:FilePath/Barbara%27s_Heritage_Restaurant_Intramuros_CNE_21.jpg', image_urls='[\"https://commons.wikimedia.org/wiki/Special:FilePath/Barbara%27s_Heritage_Restaurant_Intramuros_CNE_21.jpg\",\"https://commons.wikimedia.org/wiki/Special:FilePath/Barbara%27s_Heritage_Restaurant_Interior_Panorama.jpg\"]', is_featured=TRUE WHERE slug='barbara-s-heritage'")
-            st.executeUpdate("UPDATE dining_places SET name='Intramuros Cafe', image_path='https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=1200&q=80', image_urls='[\"https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=1200&q=80\"]', is_featured=TRUE WHERE slug='cafe-intramuros'")
-            st.executeUpdate("UPDATE dining_places SET image_path='', image_urls='[]', is_featured=FALSE WHERE slug NOT IN ('barbara-s-heritage','cafe-intramuros')")
-            st.executeUpdate("UPDATE local_services SET name='Intramuros Visitor Information Center', image_path='https://images.unsplash.com/photo-1517048676732-d65bc937f952?auto=format&fit=crop&w=1200&q=80', image_urls='[\"https://images.unsplash.com/photo-1517048676732-d65bc937f952?auto=format&fit=crop&w=1200&q=80\"]' WHERE slug='intramuros-info-center'")
-            st.executeUpdate("UPDATE local_services SET name='Intramuros First-Aid and Help Desk', image_path='https://images.unsplash.com/photo-1584515933487-779824d29309?auto=format&fit=crop&w=1200&q=80', image_urls='[\"https://images.unsplash.com/photo-1584515933487-779824d29309?auto=format&fit=crop&w=1200&q=80\"]' WHERE slug='intra-police-assist'")
-            st.executeUpdate("UPDATE local_services SET name='Plaza Moriones ATM Cluster', image_path='https://images.unsplash.com/photo-1563013544-824ae1b704d3?auto=format&fit=crop&w=1200&q=80', image_urls='[\"https://images.unsplash.com/photo-1563013544-824ae1b704d3?auto=format&fit=crop&w=1200&q=80\"]' WHERE slug='plaza-moriones-atm'")
-            st.executeUpdate("UPDATE tour_routes SET image_url='https://commons.wikimedia.org/wiki/Special:FilePath/Plaza_de_Roma%2C_Intramuros%2C_Manila.jpg', image_urls='[\"https://commons.wikimedia.org/wiki/Special:FilePath/Plaza_de_Roma%2C_Intramuros%2C_Manila.jpg\",\"https://commons.wikimedia.org/wiki/Special:FilePath/Minor_Basilica_and_Metropolitan_Cathedral_of_the_Immaculate_Conception.jpg\"]' WHERE slug='historic-core-loop'")
-            st.executeUpdate("UPDATE tour_routes SET image_url='https://commons.wikimedia.org/wiki/Special:FilePath/Manila%2C_Intramuros_walls%2C_Philippines.jpg', image_urls='[\"https://commons.wikimedia.org/wiki/Special:FilePath/Manila%2C_Intramuros_walls%2C_Philippines.jpg\",\"https://commons.wikimedia.org/wiki/Special:FilePath/Fort%20Santiago%2C%20Intramuros.JPG\"]' WHERE slug='fort-and-walls'")
-            st.executeUpdate("UPDATE tour_routes SET image_url='https://commons.wikimedia.org/wiki/Special:FilePath/Minor_Basilica_and_Metropolitan_Cathedral_of_the_Immaculate_Conception.jpg', image_urls='[\"https://commons.wikimedia.org/wiki/Special:FilePath/Minor_Basilica_and_Metropolitan_Cathedral_of_the_Immaculate_Conception.jpg\",\"https://commons.wikimedia.org/wiki/Special:FilePath/San_Agustin_Church_Manila.jpg\",\"https://commons.wikimedia.org/wiki/Special:FilePath/Plaza_de_Roma%2C_Intramuros%2C_Manila.jpg\"]' WHERE slug='churches-and-plazas'")
+            st.executeUpdate(
+                "UPDATE dining_places " +
+                    "SET image_path='https://commons.wikimedia.org/wiki/Special:FilePath/Barbara%27s_Heritage_Restaurant_Intramuros_CNE_21.jpg', " +
+                    "image_urls='[\"https://commons.wikimedia.org/wiki/Special:FilePath/Barbara%27s_Heritage_Restaurant_Intramuros_CNE_21.jpg\",\"https://commons.wikimedia.org/wiki/Special:FilePath/Barbara%27s_Heritage_Restaurant_Interior_Panorama.jpg\"]', " +
+                    "is_featured=TRUE " +
+                    "WHERE slug='barbara-s-heritage'"
+            )
+            st.executeUpdate(
+                "UPDATE dining_places " +
+                    "SET name='Intramuros Cafe', " +
+                    "image_path='https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=1200&q=80', " +
+                    "image_urls='[\"https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=1200&q=80\"]', " +
+                    "is_featured=TRUE " +
+                    "WHERE slug='cafe-intramuros'"
+            )
+            st.executeUpdate(
+                "UPDATE dining_places " +
+                    "SET image_path='', " +
+                    "image_urls='[]', " +
+                    "is_featured=FALSE " +
+                    "WHERE slug NOT IN ('barbara-s-heritage','cafe-intramuros')"
+            )
+            st.executeUpdate(
+                "UPDATE local_services " +
+                    "SET name='Intramuros Visitor Information Center', " +
+                    "image_path='https://images.unsplash.com/photo-1517048676732-d65bc937f952?auto=format&fit=crop&w=1200&q=80', " +
+                    "image_urls='[\"https://images.unsplash.com/photo-1517048676732-d65bc937f952?auto=format&fit=crop&w=1200&q=80\"]' " +
+                    "WHERE slug='intramuros-info-center'"
+            )
+            st.executeUpdate(
+                "UPDATE local_services " +
+                    "SET name='Intramuros First-Aid and Help Desk', " +
+                    "image_path='https://images.unsplash.com/photo-1584515933487-779824d29309?auto=format&fit=crop&w=1200&q=80', " +
+                    "image_urls='[\"https://images.unsplash.com/photo-1584515933487-779824d29309?auto=format&fit=crop&w=1200&q=80\"]' " +
+                    "WHERE slug='intra-police-assist'"
+            )
+            st.executeUpdate(
+                "UPDATE local_services " +
+                    "SET name='Plaza Moriones ATM Cluster', " +
+                    "image_path='https://images.unsplash.com/photo-1563013544-824ae1b704d3?auto=format&fit=crop&w=1200&q=80', " +
+                    "image_urls='[\"https://images.unsplash.com/photo-1563013544-824ae1b704d3?auto=format&fit=crop&w=1200&q=80\"]' " +
+                    "WHERE slug='plaza-moriones-atm'"
+            )
+            st.executeUpdate(
+                "UPDATE tour_routes " +
+                    "SET image_url='https://commons.wikimedia.org/wiki/Special:FilePath/Plaza_de_Roma%2C_Intramuros%2C_Manila.jpg', " +
+                    "image_urls='[\"https://commons.wikimedia.org/wiki/Special:FilePath/Plaza_de_Roma%2C_Intramuros%2C_Manila.jpg\",\"https://commons.wikimedia.org/wiki/Special:FilePath/Minor_Basilica_and_Metropolitan_Cathedral_of_the_Immaculate_Conception.jpg\"]' " +
+                    "WHERE slug='historic-core-loop'"
+            )
+            st.executeUpdate(
+                "UPDATE tour_routes " +
+                    "SET image_url='https://commons.wikimedia.org/wiki/Special:FilePath/Manila%2C_Intramuros_walls%2C_Philippines.jpg', " +
+                    "image_urls='[\"https://commons.wikimedia.org/wiki/Special:FilePath/Manila%2C_Intramuros_walls%2C_Philippines.jpg\",\"https://commons.wikimedia.org/wiki/Special:FilePath/Fort%20Santiago%2C%20Intramuros.JPG\"]' " +
+                    "WHERE slug='fort-and-walls'"
+            )
+            st.executeUpdate(
+                "UPDATE tour_routes " +
+                    "SET image_url='https://commons.wikimedia.org/wiki/Special:FilePath/Minor_Basilica_and_Metropolitan_Cathedral_of_the_Immaculate_Conception.jpg', " +
+                    "image_urls='[\"https://commons.wikimedia.org/wiki/Special:FilePath/Minor_Basilica_and_Metropolitan_Cathedral_of_the_Immaculate_Conception.jpg\",\"https://commons.wikimedia.org/wiki/Special:FilePath/San_Agustin_Church_Manila.jpg\",\"https://commons.wikimedia.org/wiki/Special:FilePath/Plaza_de_Roma%2C_Intramuros%2C_Manila.jpg\"]' " +
+                    "WHERE slug='churches-and-plazas'"
+            )
         }
     }
 
