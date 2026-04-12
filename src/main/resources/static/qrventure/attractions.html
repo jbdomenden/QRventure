@@ -5,31 +5,64 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Intramuros Attractions | QRventure</title>
   <link rel="stylesheet" href="/qrventure/css/styles.css">
+  <link rel="stylesheet" href="/qrventure/css/attractions.css">
 </head>
-<body>
+<body class="attractions-page">
 <div data-public-header data-header-title="Attractions" data-back-fallback="/qrventure/"></div>
-<main class="container">
-  <section class="hero section">
-    <div class="hero-eyebrow">Landmarks & Heritage</div>
+
+<main class="attractions-shell" id="top">
+  <nav class="breadcrumbs" aria-label="Breadcrumb">
+    <a href="/qrventure/">Home</a>
+    <span aria-hidden="true">&gt;</span>
+    <a href="/qrventure/">Intramuros</a>
+    <span aria-hidden="true">&gt;</span>
+    <span aria-current="page">Attractions</span>
+  </nav>
+
+  <section class="hero section attractions-hero">
+    <div class="hero-eyebrow">Landmarks &amp; Heritage</div>
     <h1>Attractions in Intramuros</h1>
-    <p>Browse curated stops around Fort Santiago, San Agustin Church, Casa Manila, Manila Cathedral, and more historic sites.</p>
-    <form class="search-row" method="get">
-      <input class="input" name="q" placeholder="Search by name or keyword">
-      <select class="select" name="category">
+    <p>Explore curated heritage stops around Fort Santiago, San Agustin Church, Casa Manila, Manila Cathedral, and more.</p>
+
+    <div class="pill-nav" role="navigation" aria-label="Attraction quick filters">
+      <button class="pill is-active" type="button" data-category="">All</button>
+      <button class="pill" type="button" data-category="Historic Landmark">Historic Landmark</button>
+      <button class="pill" type="button" data-category="Museum">Museum</button>
+      <button class="pill" type="button" data-category="Religious Heritage">Religious Heritage</button>
+    </div>
+
+    <button class="filter-toggle" type="button" aria-expanded="false" aria-controls="filters-panel">Filters</button>
+
+    <section class="filters-panel" id="filters-panel" aria-label="Search and filters">
+      <div class="search-field">
+        <input class="input" id="searchInput" name="q" autocomplete="off" placeholder="Search attractions">
+        <button class="clear-search" id="clearSearch" type="button" aria-label="Clear search">×</button>
+      </div>
+      <select class="select" id="categorySelect" name="category" aria-label="Filter by category">
         <option value="">All categories</option>
-        <option>Historical Site</option>
-        <option>Museum</option>
-        <option>Religious Heritage</option>
+        <option value="Historic Landmark">Historic Landmark</option>
+        <option value="Museum">Museum</option>
+        <option value="Religious Heritage">Religious Heritage</option>
+        <option value="Historic Fortification">Historic Fortification</option>
+        <option value="Plaza">Plaza</option>
+        <option value="City Gate">City Gate</option>
+        <option value="Park">Park</option>
+        <option value="Memorial">Memorial</option>
       </select>
-      <button class="btn btn-primary">Apply</button>
-    </form>
+    </section>
   </section>
-  <section class="section"><div id="items"></div></section>
+
+  <section class="section attractions-results" aria-live="polite">
+    <div id="items" class="attractions-grid-wrap"></div>
+  </section>
 </main>
-<footer class="footer"><div class="container">Explore more: routes, dining, and services in Intramuros.</div></footer>
+
+<footer class="footer">
+  <div class="attractions-shell">Explore more: routes, dining, and services in Intramuros.</div>
+</footer>
+
 <script src="/qrventure/js/public-header.js"></script>
 <script src="/qrventure/js/api.js"></script>
-<script src="/qrventure/js/listing.js"></script>
-<script>loadListing({target:'#items',endpoint:'/api/attractions',type:'attractions',empty:'No attractions found for your filters.',filters:[{url:'q',api:'q'},{url:'category',api:'category'}]})</script>
+<script src="/qrventure/js/attractions.js"></script>
 </body>
 </html>
