@@ -1,0 +1,8 @@
+{
+  "name": "qrventure-render-runner",
+  "private": true,
+  "scripts": {
+    "start": "./gradlew run --args='-port ${PORT:-8020}'",
+    "build": "./gradlew build -x test"
+  }
+}
