@@ -7,16 +7,10 @@
   <link rel="stylesheet" href="/qrventure/css/styles.css">
 </head>
 <body>
-<header class="top-nav">
-  <div class="container nav-inner">
-    <a class="brand" href="/">QRventure Intramuros</a>
-    <nav class="nav-links">
-      <a href="/qrventure/attractions">Attractions</a><a href="/qrventure/routes">Routes</a>
-    </nav>
-  </div>
-</header>
+<div data-public-header data-header-title="Attraction Details" data-back-fallback="/qrventure/attractions"></div>
 <main class="container section"><div id="detail"></div></main>
 <footer class="footer"><div class="container">Return to attractions to continue planning your itinerary.</div></footer>
+<script src="/qrventure/js/public-header.js"></script>
 <script src="/qrventure/js/api.js"></script>
 <script src="/qrventure/js/detail.js"></script>
 <script>loadDetail('/api/attractions','Attraction')</script>
