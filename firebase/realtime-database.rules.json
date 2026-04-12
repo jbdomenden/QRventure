@@ -1,0 +1,8 @@
+{
+  "rules": {
+    "qrventure": {
+      ".read": true,
+      ".write": false
+    }
+  }
+}
