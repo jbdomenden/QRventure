@@ -2,7 +2,7 @@
   "name": "qrventure-render-runner",
   "private": true,
   "scripts": {
-    "start": "./gradlew run --args='-port ${PORT:-8020}'",
-    "build": "./gradlew build -x test"
+    "start": "./scripts/render-start.sh",
+    "build": "echo 'No Node build step required for Kotlin app'"
   }
 }
