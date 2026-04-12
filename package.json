@@ -1,0 +1,9 @@
+{
+  "name": "qrventure-brochure",
+  "private": true,
+  "version": "1.0.0",
+  "description": "QRventure brochure Firebase dependencies",
+  "dependencies": {
+    "firebase": "^12.0.0"
+  }
+}
