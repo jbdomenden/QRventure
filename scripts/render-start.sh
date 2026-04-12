@@ -32,4 +32,5 @@ export JAVA_HOME="$JAVA_HOME_DIR"
 export PATH="$JAVA_HOME/bin:$PATH"
 
 echo "[render-start] Using $(java -version 2>&1 | head -n 1)"
-exec ./gradlew run --args="-port ${PORT:-8020}"
+export GRADLE_OPTS="${GRADLE_OPTS:-} -Dorg.gradle.daemon=false"
+exec ./gradlew --no-daemon run --args="-port ${PORT:-8020}"
