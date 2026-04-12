@@ -33,4 +33,4 @@ export PATH="$JAVA_HOME/bin:$PATH"
 
 echo "[render-start] Using $(java -version 2>&1 | head -n 1)"
 export GRADLE_OPTS="${GRADLE_OPTS:-} -Dorg.gradle.daemon=false"
-exec ./gradlew --no-daemon run --args="-port ${PORT:-8020}"
+exec ./gradlew --no-daemon --max-workers=1 -Dkotlin.compiler.execution.strategy=in-process -Dkotlin.daemon.enabled=false -Dorg.gradle.vfs.watch=false run --args="-port ${PORT:-8020}"
