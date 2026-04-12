@@ -18,4 +18,4 @@ COPY --from=build /app/build/install/QRventure /app/qrventure
 ENV PORT=8020
 EXPOSE 8020
 
-CMD ["sh", "-c", "/app/qrventure/bin/QRventure -port ${PORT}"]
+CMD ["sh", "-c", "/app/qrventure/bin/QRventure -port ${PORT:-8020}"]
