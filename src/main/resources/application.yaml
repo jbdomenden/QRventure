@@ -1,0 +1,27 @@
+ktor:
+  application:
+    modules:
+    - app.QRventure.ApplicationKt.module
+
+  deployment:
+    port: ${PORT}
+
+database:
+  driver: "org.postgresql.Driver"
+  url: ${JDBC_DATABASE_URL}
+  user: ${DB_USER}
+  password: ${DB_PASSWORD}
+
+
+  #ktor:
+  #  application:
+  #    modules:
+  #      - app.QRventure.ApplicationKt.module
+  #  deployment:
+  #    port: 8020
+  #
+  #database:
+  #  driver: "org.postgresql.Driver"
+  #  url: "jdbc:postgresql://192.168.88.4:5434/qrventure_db?prepareThreshold=0"
+  #  user: "postgres"
+  #  password: "root"
