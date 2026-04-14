@@ -6,7 +6,7 @@ ktor:
   deployment:
     port: ${PORT}
 
-database:
+postgres:
   driver: "org.postgresql.Driver"
   url: ${JDBC_DATABASE_URL}
   user: ${DB_USER}
