@@ -1,14 +1,25 @@
 package app.QRventure.db
 
-import io.ktor.server.config.*
 import java.sql.Connection
 import java.sql.DriverManager
 
 object DatabaseFactory {
-    fun connect(config: ApplicationConfig): Connection {
-        val url = config.property("postgres.url").getString()
-        if (url.startsWith("jdbc:h2:")) Class.forName("org.h2.Driver") else Class.forName("org.postgresql.Driver")
-        return DriverManager.getConnection(url, config.property("postgres.user").getString(), config.property("postgres.password").getString())
+    fun connect(dbUrl: String, dbUser: String, dbPass: String): Connection {
+        require(dbUrl.startsWith("jdbc:postgresql://")) {
+            "JDBC_DATABASE_URL must start with jdbc:postgresql://"
+        }
+        require(dbUrl.contains(".pooler.supabase.com:6543/")) {
+            "JDBC_DATABASE_URL must use Supabase pooler host and port 6543"
+        }
+        require(dbUrl.contains("/postgres")) {
+            "JDBC_DATABASE_URL must include a database name (for Supabase default: /postgres)"
+        }
+        require(dbUrl.contains("sslmode=require")) {
+            "JDBC_DATABASE_URL must include sslmode=require"
+        }
+
+        Class.forName("org.postgresql.Driver")
+        return DriverManager.getConnection(dbUrl, dbUser, dbPass)
     }
 
     fun initializeSchema(connection: Connection) {

@@ -15,35 +15,43 @@ fun main() {
 }
 
 fun Application.module() {
-    configureHTTP()
-    configureSerialization()
+    try {
+        println("Starting application")
 
-    val isDatabaseRequired = environment.config.propertyOrNull("postgres.required")?.getString()?.toBooleanStrictOrNull() ?: true
+        configureHTTP()
+        configureSerialization()
 
-    val connection = runCatching { DatabaseFactory.connect(environment.config) }
-        .onFailure { throwable ->
-            if (isDatabaseRequired) {
-                log.error("Database connection failed and postgres.required=true. Server startup is aborted.", throwable)
-            } else {
-                log.error("Database connection failed and postgres.required=false. Site pages will still be served, but APIs will return 503.", throwable)
+        val skipDb = System.getenv("SKIP_DB") == "true"
+        val connection = if (!skipDb) {
+            println("Initializing database")
+            val dbUrl = System.getenv("JDBC_DATABASE_URL")
+            val dbUser = System.getenv("DB_USER")
+            val dbPass = System.getenv("DB_PASSWORD")
+
+            require(!dbUrl.isNullOrBlank()) { "JDBC_DATABASE_URL is missing" }
+            require(!dbUser.isNullOrBlank()) { "DB_USER is missing" }
+            require(!dbPass.isNullOrBlank()) { "DB_PASSWORD is missing" }
+
+            val connected = DatabaseFactory.connect(dbUrl, dbUser, dbPass)
+            DatabaseFactory.initializeSchema(connected)
+            DatabaseFactory.seedData(connected)
+            println("Database initialized")
+            connected
+        } else {
+            println("Skipping database initialization because SKIP_DB=true")
+            null
+        }
+
+        if (connection != null) {
+            monitor.subscribe(ApplicationStopping) {
+                connection.close()
             }
         }
-        .getOrNull()
 
-    if (connection == null && isDatabaseRequired) {
-        throw IllegalStateException(
-            "Unable to connect to PostgreSQL. Update postgres.url/user/password (and optional postgres.required) in application config and restart."
-        )
+        configurePublicApiRoutes(connection)
+        configurePublicSiteRoutes()
+    } catch (e: Exception) {
+        e.printStackTrace()
+        throw e
     }
-
-    if (connection != null) {
-        DatabaseFactory.initializeSchema(connection)
-        DatabaseFactory.seedData(connection)
-        monitor.subscribe(ApplicationStopping) {
-            connection.close()
-        }
-    }
-
-    configurePublicApiRoutes(connection)
-    configurePublicSiteRoutes()
 }
