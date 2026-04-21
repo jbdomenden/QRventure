@@ -9,6 +9,10 @@ import io.ktor.server.routing.*
 
 fun Application.configurePublicSiteRoutes() {
     routing {
+        get("/health") {
+            call.respondText("OK", ContentType.Text.Plain, HttpStatusCode.OK)
+        }
+
         get("/") {
             val homepage = ResourceUtils.readResourceOrNull("static/qrventure/index.html")
                 ?: return@get call.respond(HttpStatusCode.InternalServerError, "Homepage not found")

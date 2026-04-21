@@ -191,3 +191,19 @@ After launching the server, validate in order:
 6. Refresh public pages and verify changes persist from DB.
 7. Test search from homepage and `/qrventure/navigation.html`.
 
+---
+
+## Render Keep-Alive Configuration (Free Tier)
+
+Set these environment variables in Render:
+
+- `RENDER_EXTERNAL_URL=https://your-service.onrender.com`
+
+The service includes an internal self-ping loop that sends `GET {RENDER_EXTERNAL_URL}/health` every 10 minutes.
+
+Also configure an external monitor because internal ping cannot wake a fully spun-down instance:
+
+- Provider: UptimeRobot or cron-job.org
+- Method: `GET`
+- URL: `https://your-service.onrender.com/health`
+- Interval: every 5 minutes
