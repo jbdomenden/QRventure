@@ -48,8 +48,8 @@ object DatabaseFactory {
                         category VARCHAR(80) NOT NULL DEFAULT '',
                         historical_period VARCHAR(120) NOT NULL DEFAULT '',
                         location_text VARCHAR(220) NOT NULL DEFAULT '',
-                        opening_hours VARCHAR(150) NOT NULL DEFAULT '',
-                        entrance_fee VARCHAR(120) NOT NULL DEFAULT '',
+                        opening_hours TEXT NOT NULL DEFAULT '',
+                        entrance_fee TEXT NOT NULL DEFAULT '',
                         contact_details VARCHAR(180) NOT NULL DEFAULT '',
                         visitor_tips TEXT NOT NULL DEFAULT '',
                         best_time_to_visit VARCHAR(120) NOT NULL DEFAULT '',
@@ -75,7 +75,7 @@ object DatabaseFactory {
                         dining_type VARCHAR(100) NOT NULL DEFAULT '',
                         cuisine VARCHAR(100) NOT NULL DEFAULT '',
                         location_text VARCHAR(220) NOT NULL DEFAULT '',
-                        opening_hours VARCHAR(150) NOT NULL DEFAULT '',
+                        opening_hours TEXT NOT NULL DEFAULT '',
                         price_range VARCHAR(80) NOT NULL DEFAULT '',
                         contact_details VARCHAR(180) NOT NULL DEFAULT '',
                         visitor_notes TEXT NOT NULL DEFAULT '',
@@ -100,7 +100,7 @@ object DatabaseFactory {
                         full_description TEXT NOT NULL DEFAULT '',
                         service_type VARCHAR(100) NOT NULL DEFAULT '',
                         location_text VARCHAR(220) NOT NULL DEFAULT '',
-                        hours VARCHAR(150) NOT NULL DEFAULT '',
+                        hours TEXT NOT NULL DEFAULT '',
                         contact_details VARCHAR(180) NOT NULL DEFAULT '',
                         visitor_notes TEXT NOT NULL DEFAULT '',
                         latitude DOUBLE PRECISION NOT NULL DEFAULT 0,
@@ -141,6 +141,10 @@ object DatabaseFactory {
                 st.execute("ALTER TABLE attractions ADD COLUMN IF NOT EXISTS full_description TEXT NOT NULL DEFAULT ''")
                 st.execute("ALTER TABLE attractions ADD COLUMN IF NOT EXISTS category VARCHAR(80) NOT NULL DEFAULT ''")
                 st.execute("ALTER TABLE attractions ADD COLUMN IF NOT EXISTS historical_period VARCHAR(120) NOT NULL DEFAULT ''")
+                st.execute("ALTER TABLE attractions ADD COLUMN IF NOT EXISTS opening_hours TEXT NOT NULL DEFAULT ''")
+                st.execute("ALTER TABLE attractions ALTER COLUMN opening_hours TYPE TEXT")
+                st.execute("ALTER TABLE attractions ADD COLUMN IF NOT EXISTS entrance_fee TEXT NOT NULL DEFAULT ''")
+                st.execute("ALTER TABLE attractions ALTER COLUMN entrance_fee TYPE TEXT")
                 st.execute("ALTER TABLE attractions ADD COLUMN IF NOT EXISTS visitor_tips TEXT NOT NULL DEFAULT ''")
                 st.execute("ALTER TABLE attractions ADD COLUMN IF NOT EXISTS best_time_to_visit VARCHAR(120) NOT NULL DEFAULT ''")
                 st.execute("ALTER TABLE attractions ADD COLUMN IF NOT EXISTS image_urls TEXT NOT NULL DEFAULT '[]'")
@@ -151,6 +155,8 @@ object DatabaseFactory {
                 st.execute("ALTER TABLE dining_places ADD COLUMN IF NOT EXISTS full_description TEXT NOT NULL DEFAULT ''")
                 st.execute("ALTER TABLE dining_places ADD COLUMN IF NOT EXISTS dining_type VARCHAR(100) NOT NULL DEFAULT ''")
                 st.execute("ALTER TABLE dining_places ADD COLUMN IF NOT EXISTS cuisine VARCHAR(100) NOT NULL DEFAULT ''")
+                st.execute("ALTER TABLE dining_places ADD COLUMN IF NOT EXISTS opening_hours TEXT NOT NULL DEFAULT ''")
+                st.execute("ALTER TABLE dining_places ALTER COLUMN opening_hours TYPE TEXT")
                 st.execute("ALTER TABLE dining_places ADD COLUMN IF NOT EXISTS visitor_notes TEXT NOT NULL DEFAULT ''")
                 st.execute("ALTER TABLE dining_places ADD COLUMN IF NOT EXISTS image_urls TEXT NOT NULL DEFAULT '[]'")
                 st.execute("ALTER TABLE dining_places ADD COLUMN IF NOT EXISTS is_featured BOOLEAN NOT NULL DEFAULT FALSE")
@@ -159,7 +165,8 @@ object DatabaseFactory {
 
                 st.execute("ALTER TABLE local_services ADD COLUMN IF NOT EXISTS short_description TEXT NOT NULL DEFAULT ''")
                 st.execute("ALTER TABLE local_services ADD COLUMN IF NOT EXISTS full_description TEXT NOT NULL DEFAULT ''")
-                st.execute("ALTER TABLE local_services ADD COLUMN IF NOT EXISTS hours VARCHAR(150) NOT NULL DEFAULT ''")
+                st.execute("ALTER TABLE local_services ADD COLUMN IF NOT EXISTS hours TEXT NOT NULL DEFAULT ''")
+                st.execute("ALTER TABLE local_services ALTER COLUMN hours TYPE TEXT")
                 st.execute("ALTER TABLE local_services ADD COLUMN IF NOT EXISTS visitor_notes TEXT NOT NULL DEFAULT ''")
                 st.execute("ALTER TABLE local_services ADD COLUMN IF NOT EXISTS image_urls TEXT NOT NULL DEFAULT '[]'")
                 st.execute("ALTER TABLE local_services ADD COLUMN IF NOT EXISTS status VARCHAR(30) NOT NULL DEFAULT 'open'")
