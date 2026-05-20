@@ -1,10 +1,15 @@
 package app.QRventure
 
+import app.QRventure.config.AppConfig
 import app.QRventure.db.DatabaseFactory
+import app.QRventure.repositories.TourismRepository
 import app.QRventure.routes.configurePublicApiRoutes
 import app.QRventure.routes.configurePublicSiteRoutes
 import io.ktor.client.*
+import io.ktor.client.engine.cio.*
+import io.ktor.client.plugins.*
 import io.ktor.client.request.*
+import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
@@ -17,43 +22,31 @@ fun main() {
     }.start(wait = true)
 }
 
-fun Application.module() {
+fun Application.module(repositoryOverride: TourismRepository? = null, enableSelfPing: Boolean = true) {
     try {
         println("Starting application")
 
         configureHTTP()
         configureSerialization()
 
-        val skipDb = System.getenv("SKIP_DB") == "true"
-        val connection = if (!skipDb) {
+        val repository = repositoryOverride ?: run {
             println("Initializing database")
-            val dbUrl = System.getenv("JDBC_DATABASE_URL")
-            val dbUser = System.getenv("DB_USER")
-            val dbPass = System.getenv("DB_PASSWORD")
-
-            require(!dbUrl.isNullOrBlank()) { "JDBC_DATABASE_URL is missing" }
-            require(!dbUser.isNullOrBlank()) { "DB_USER is missing" }
-            require(!dbPass.isNullOrBlank()) { "DB_PASSWORD is missing" }
-
-            val connected = DatabaseFactory.connect(dbUrl, dbUser, dbPass)
-            DatabaseFactory.initializeSchema(connected)
-            DatabaseFactory.seedData(connected)
-            println("Database initialized")
-            connected
-        } else {
-            println("Skipping database initialization because SKIP_DB=true")
-            null
-        }
-
-        if (connection != null) {
-            monitor.subscribe(ApplicationStopping) {
-                connection.close()
+            DatabaseFactory.createRepository(AppConfig.postgres(environment.config)).also {
+                println("Database initialized")
             }
         }
 
-        configurePublicApiRoutes(connection)
+        if (repository is AutoCloseable) {
+            monitor.subscribe(ApplicationStopping) {
+                repository.close()
+            }
+        }
+
+        configurePublicApiRoutes(repository)
         configurePublicSiteRoutes()
-        startSelfPingScheduler()
+        if (enableSelfPing) {
+            startSelfPingScheduler()
+        }
     } catch (e: Exception) {
         e.printStackTrace()
         throw e
@@ -62,16 +55,25 @@ fun Application.module() {
 
 private fun Application.startSelfPingScheduler() {
     val pingScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
-    val client = HttpClient()
+    val client = HttpClient(CIO) {
+        expectSuccess = true
+        install(HttpTimeout) {
+            requestTimeoutMillis = 15_000
+            connectTimeoutMillis = 10_000
+            socketTimeoutMillis = 15_000
+        }
+    }
 
-    environment.monitor.subscribe(ApplicationStarted) {
+    monitor.subscribe(ApplicationStarted) {
         pingScope.launch {
             while (true) {
                 try {
                     val url = System.getenv("RENDER_EXTERNAL_URL")
                     if (!url.isNullOrBlank()) {
-                        client.get("${url.trimEnd('/')}/health")
-                        println("Self ping success")
+                        val response = client.get("${url.trimEnd('/')}/health")
+                        if (response.status.isSuccess()) {
+                            println("Self ping success")
+                        }
                     } else {
                         println("RENDER_EXTERNAL_URL not set")
                     }
@@ -84,7 +86,7 @@ private fun Application.startSelfPingScheduler() {
         }
     }
 
-    environment.monitor.subscribe(ApplicationStopping) {
+    monitor.subscribe(ApplicationStopping) {
         pingScope.cancel()
         client.close()
     }

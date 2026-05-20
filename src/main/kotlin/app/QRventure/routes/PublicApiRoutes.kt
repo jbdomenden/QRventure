@@ -1,24 +1,17 @@
 package app.QRventure.routes
 
 import app.QRventure.dto.ErrorResponse
+import app.QRventure.repositories.TourismRepository
 import app.QRventure.services.TourismService
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import java.sql.Connection
 
-fun Application.configurePublicApiRoutes(connection: Connection?) {
+fun Application.configurePublicApiRoutes(repository: TourismRepository) {
     routing {
         route("/api") {
-            if (connection == null) {
-                get("/{...}") {
-                    call.respond(HttpStatusCode.ServiceUnavailable, ErrorResponse("Database is unavailable. Check postgres settings and restart the server."))
-                }
-                return@route
-            }
-
-            val service = TourismService(connection)
+            val service = TourismService(repository)
             get("/featured") { call.respond(service.featured()) }
             get("/attractions") { call.respond(service.attractions(call.request.queryParameters["q"], call.request.queryParameters["category"])) }
             get("/attractions/{idOrSlug}") {

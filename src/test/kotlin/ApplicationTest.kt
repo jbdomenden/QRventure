@@ -1,5 +1,6 @@
 package app.QRventure
 
+import app.QRventure.repositories.TourismRepository
 import io.ktor.client.request.*
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.*
@@ -9,53 +10,35 @@ import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 class ApplicationTest {
+    private val repository = object : TourismRepository {
+        override suspend fun attractions() = TestTourismData.attractions
+        override suspend fun dining() = TestTourismData.dining
+        override suspend fun services() = TestTourismData.services
+        override suspend fun tourRoutes() = TestTourismData.routes
+    }
+
     @Test
     fun testRootServesHomepage() = testApplication {
-        environment {
-            config = MapApplicationConfig(
-                "postgres.url" to "jdbc:h2:mem:test;DB_CLOSE_DELAY=-1",
-                "postgres.user" to "sa",
-                "postgres.password" to ""
-            )
-        }
-        application { module() }
+        application { module(repositoryOverride = repository, enableSelfPing = false) }
 
         val response = client.get("/")
         assertEquals(HttpStatusCode.OK, response.status)
     }
 
     @Test
-    fun testAdminLoginAndMeFlow() = testApplication {
-        environment {
-            config = MapApplicationConfig(
-                "postgres.url" to "jdbc:h2:mem:test;DB_CLOSE_DELAY=-1",
-                "postgres.user" to "sa",
-                "postgres.password" to "",
-                "adminAuth.username" to "admin",
-                "adminAuth.passwordHash" to "uuwgBkpbBLDkauDW88ClZxZDarRvu9hsHzJUJCGI2VY=",
-                "adminAuth.passwordSalt" to "7FEZnOhXPhFJr4JKFEtqQQ==",
-                "adminAuth.iterations" to "120000"
-            )
-        }
-        application { module() }
+    fun testFeaturedEndpointReturnsPublicContent() = testApplication {
+        application { module(repositoryOverride = repository, enableSelfPing = false) }
 
-        val unauthorized = client.get("/api/admin/me")
-        assertEquals(HttpStatusCode.Unauthorized, unauthorized.status)
+        val response = client.get("/api/featured")
+        assertEquals(HttpStatusCode.OK, response.status)
+        assertTrue(response.bodyAsText().contains("Fort Santiago"))
+    }
 
-        val login = client.post("/api/admin/login") {
-            contentType(ContentType.Application.Json)
-            setBody("""{"username":"admin","password":"IntramurosAdmin!2026"}""")
-        }
-        assertEquals(HttpStatusCode.OK, login.status)
+    @Test
+    fun testSearchRejectsShortQueries() = testApplication {
+        application { module(repositoryOverride = repository, enableSelfPing = false) }
 
-        val me = client.get("/api/admin/me")
-        assertEquals(HttpStatusCode.OK, me.status)
-        assertTrue(me.bodyAsText().contains("admin"))
-
-        val logout = client.post("/api/admin/logout")
-        assertEquals(HttpStatusCode.OK, logout.status)
-
-        val unauthorizedAgain = client.get("/api/admin/me")
-        assertEquals(HttpStatusCode.Unauthorized, unauthorizedAgain.status)
+        val response = client.get("/api/search?q=f")
+        assertEquals(HttpStatusCode.BadRequest, response.status)
     }
 }

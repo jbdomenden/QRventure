@@ -5,3 +5,10 @@ ktor:
   deployment:
     port: ${PORT:8080}
     host: 0.0.0.0
+
+postgres:
+  jdbcUrl: ${JDBC_DATABASE_URL:}
+  databaseUrl: ${DATABASE_URL:}
+  user: ${DB_USER:}
+  password: ${DB_PASSWORD:}
+  poolMaxSize: ${DB_POOL_MAX_SIZE:5}

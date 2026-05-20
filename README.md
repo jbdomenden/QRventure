@@ -1,209 +1,76 @@
-# QRventure Intramuros Tourism Website
+# QRventure
 
-A production-oriented, mobile-first tourism web platform for Intramuros, Manila using:
+Ktor-based tourism site for Intramuros with static pages plus a public JSON API backed by PostgreSQL. Supabase is a supported deployment target because the app reads its database settings from Ktor config in `application.yaml`, with values typically injected by environment variables.
 
-- Kotlin
-- Ktor
-- PostgreSQL
-- Plain HTML, CSS, JavaScript
+## Runtime
 
-No frontend frameworks are used.
+- Ktor serves the public pages from `src/main/resources/static/qrventure`.
+- Public content is loaded from PostgreSQL through server-side routes under `/api`.
+- The backend uses JDBC with a small Hikari connection pool.
 
----
+## Database layout
 
-## Phase 10 — Final Validation
+Use four tables:
 
-This project now includes:
+- `attractions`
+- `dining_places`
+- `local_services`
+- `tour_routes`
 
-- Public tourism website with real API-backed content rendering.
-- Admin CMS with authenticated session login.
-- CRUD APIs for attractions, dining, services, and walking routes.
-- Image upload endpoint for CMS content.
-- PostgreSQL schema initialization + seed data.
-- Search APIs consumed by public pages and admin list views.
+Rows should usually be keyed by `slug`. Stored fields match the JSON already consumed by the frontend, such as `name`, `short_description`, `image_urls`, `status`, and `sort_order`.
 
-### Final validation checklist mapping
+## Environment
 
-1. `/` loads homepage
-   - `GET /` serves `static/qrventure/index.html` through `configurePublicSiteRoutes()`.
-2. No Hello World
-   - No `Hello World` content in Kotlin routes/static pages.
-3. Assets load correctly
-   - `staticResources("/qrventure", "static/qrventure")` exposes CSS/JS/images/uploads.
-4. Admin login works
-   - `POST /api/admin/login` validates credentials and sets session cookie.
-5. CRUD works
-   - Admin routes expose create/read/update/delete for attractions, dining, services, and routes.
-6. Upload works
-   - `POST /api/admin/upload` saves validated images into `static/qrventure/uploads`.
-7. Data reflects DB
-   - Public + admin APIs read/write through JDBC-backed service layer into PostgreSQL tables.
-8. Search works
-   - `GET /api/search?q=...`, plus list filters for attractions/dining/services/routes.
-
----
-
-## Full File Changes (Phase 10)
-
-- Updated documentation for final delivery/validation in this `README.md`.
-
----
-
-## Final Project Tree
-
-```text
-.
-├── README.md
-├── build.gradle.kts
-├── gradle.properties
-├── gradlew
-├── gradlew.bat
-├── settings.gradle.kts
-├── gradle/
-│   └── wrapper/
-│       ├── gradle-wrapper.jar
-│       └── gradle-wrapper.properties
-└── src/
-    ├── main/
-    │   ├── kotlin/
-    │   │   ├── Application.kt
-    │   │   ├── Databases.kt
-    │   │   ├── HTTP.kt
-    │   │   ├── Routing.kt
-    │   │   ├── Security.kt
-    │   │   ├── Serialization.kt
-    │   │   └── app/QRventure/
-    │   │       ├── auth/
-    │   │       │   └── AdminAuth.kt
-    │   │       ├── config/
-    │   │       │   └── AppConfig.kt
-    │   │       ├── db/
-    │   │       │   └── DatabaseFactory.kt
-    │   │       ├── dto/
-    │   │       │   ├── Requests.kt
-    │   │       │   ├── Responses.kt
-    │   │       │   └── Validation.kt
-    │   │       ├── model/
-    │   │       │   └── Models.kt
-    │   │       ├── models/
-    │   │       │   └── Models.kt
-    │   │       ├── route/
-    │   │       │   ├── ApiRoutes.kt
-    │   │       │   └── SiteRoutes.kt
-    │   │       ├── routes/
-    │   │       │   ├── AdminRoutes.kt
-    │   │       │   ├── PublicApiRoutes.kt
-    │   │       │   └── PublicSiteRoutes.kt
-    │   │       ├── service/
-    │   │       │   └── TourismService.kt
-    │   │       ├── services/
-    │   │       │   └── TourismService.kt
-    │   │       └── utils/
-    │   │           └── ResourceUtils.kt
-    │   └── resources/
-    │       ├── application.yaml
-    │       ├── logback.xml
-    │       └── static/
-    │           ├── index.html
-    │           └── qrventure/
-    │               ├── index.html
-    │               ├── attractions.html
-    │               ├── attraction-detail.html
-    │               ├── dining.html
-    │               ├── dining-detail.html
-    │               ├── services.html
-    │               ├── service-detail.html
-    │               ├── navigation.html
-    │               ├── routes.html
-    │               ├── admin/
-    │               │   ├── index.html
-    │               │   └── login.html
-    │               ├── css/
-    │               │   └── styles.css
-    │               ├── js/
-    │               │   ├── admin-api.js
-    │               │   ├── admin-cms.js
-    │               │   ├── admin-login.js
-    │               │   ├── api.js
-    │               │   ├── detail.js
-    │               │   ├── home.js
-    │               │   ├── listing.js
-    │               │   └── navigation.js
-    │               ├── images/
-    │               │   └── *.svg
-    │               └── uploads/
-    │                   └── .gitkeep
-    └── test/
-        └── kotlin/
-            └── ApplicationTest.kt
-```
-
----
-
-## PostgreSQL Setup Steps
-
-1. Install PostgreSQL 14+ and ensure the service is running.
-2. Create database + user credentials:
-
-```sql
-CREATE DATABASE qrventure_db;
-```
-
-3. Confirm your `src/main/resources/application.yaml` values match your local PostgreSQL instance:
+`application.yaml` defines the database config keys:
 
 ```yaml
 postgres:
-  url: "jdbc:postgresql://localhost:5434/qrventure_db"
-  user: "postgres"
-  password: "root"
+  jdbcUrl: ${JDBC_DATABASE_URL:}
+  databaseUrl: ${DATABASE_URL:}
+  user: ${DB_USER:}
+  password: ${DB_PASSWORD:}
+  poolMaxSize: ${DB_POOL_MAX_SIZE:5}
 ```
 
-> If your PostgreSQL uses port `5432` (default), update the JDBC URL accordingly.
+Required:
 
-4. Start the app once; schema creation + seed data are executed automatically by `DatabaseFactory` at startup.
+- `JDBC_DATABASE_URL`
+  - or `DATABASE_URL`
 
----
+Optional:
 
-## IntelliJ IDEA Run Steps
-
-1. Open the repository in IntelliJ IDEA.
-2. Set the Project SDK to Java 21.
-3. Wait for Gradle sync to complete.
-4. Open `src/main/kotlin/Application.kt`.
-5. Run `main()` in `ApplicationKt`.
-6. Open:
-   - Public site: `http://localhost:8020/`
-   - Admin login: `http://localhost:8020/admin/login`
-
-Default admin credentials are configured from `application.yaml` under `adminAuth`.
-
----
-
-## Suggested Manual Validation Script
-
-After launching the server, validate in order:
-
-1. Visit `/` and confirm homepage renders (no plain text placeholder output).
-2. Confirm CSS, JS, and image assets load from `/qrventure/...`.
-3. Log in at `/admin/login`.
-4. In admin CMS, create/update/delete one record from each module.
-5. Upload a JPG/PNG/WEBP image and verify path resolves in browser.
-6. Refresh public pages and verify changes persist from DB.
-7. Test search from homepage and `/qrventure/navigation.html`.
-
----
-
-## Render Keep-Alive Configuration (Free Tier)
-
-Set these environment variables in Render:
-
+- `DB_USER`
+- `DB_PASSWORD`
+- `DB_POOL_MAX_SIZE`
 - `RENDER_EXTERNAL_URL=https://your-service.onrender.com`
 
-The service includes an internal self-ping loop that sends `GET {RENDER_EXTERNAL_URL}/health` every 10 minutes.
+If you use Supabase, point those env vars at your Supabase Postgres connection. The app will create missing tables, but it does not seed content. All tourism records must come from your database.
 
-Also configure an external monitor because internal ping cannot wake a fully spun-down instance:
+## Local run
 
-- Provider: UptimeRobot or cron-job.org
-- Method: `GET`
-- URL: `https://your-service.onrender.com/health`
-- Interval: every 5 minutes
+1. Use JDK 21.
+2. Set `JDBC_DATABASE_URL` or `DATABASE_URL` in the environment.
+3. If your URL does not embed credentials, also set `DB_USER` and `DB_PASSWORD`.
+4. Ensure your database contains tourism records.
+5. Start the app:
+
+```powershell
+.\gradlew.bat run
+```
+
+6. Open `http://localhost:8080/`.
+
+## Validation
+
+- `GET /health`
+- `GET /api/featured`
+- `GET /api/attractions`
+- `GET /api/dining`
+- `GET /api/services`
+- `GET /api/routes`
+- `GET /api/search?q=fort`
+
+## Notes
+
+- The public API contract is preserved, but the only runtime data source is PostgreSQL.
+- Filtering and search are performed in the app layer after sorted table reads, which keeps the schema simple for this content dataset.

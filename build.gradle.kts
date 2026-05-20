@@ -1,7 +1,7 @@
-val h2_version: String by project
+val hikari_version: String by project
 val kotlin_version: String by project
 val logback_version: String by project
-val postgres_version: String by project
+val postgresql_version: String by project
 
 plugins {
     kotlin("jvm") version "2.3.0"
@@ -33,11 +33,11 @@ dependencies {
     implementation("io.ktor:ktor-serialization-kotlinx-json")
     implementation("io.ktor:ktor-client-core")
     implementation("io.ktor:ktor-client-cio")
-    implementation("org.postgresql:postgresql:$postgres_version")
-    implementation("com.h2database:h2:$h2_version")
+    implementation("com.zaxxer:HikariCP:$hikari_version")
     implementation("io.ktor:ktor-server-netty")
     implementation("ch.qos.logback:logback-classic:$logback_version")
     implementation("io.ktor:ktor-server-config-yaml")
+    implementation("org.postgresql:postgresql:$postgresql_version")
     testImplementation("io.ktor:ktor-server-test-host")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version")
 }
