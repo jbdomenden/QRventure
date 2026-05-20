@@ -9,49 +9,46 @@
 </head>
 <body class="attractions-page">
 <div data-public-header data-header-title="Attractions" data-back-fallback="/qrventure/"></div>
-
-<main class="attractions-shell" id="top">
-
+<main class="container attractions-shell" id="top">
   <section class="hero section attractions-hero">
     <div class="hero-eyebrow">Landmarks &amp; Heritage</div>
-    <h1>Attractions in Intramuros</h1>
-    <p>Explore curated heritage stops around Fort Santiago, San Agustin Church, Casa Manila, Manila Cathedral, and more.</p>
+    <h1>Attractions in and around the Walled City</h1>
+    <p>Browse museums, churches, forts, plazas, and heritage stops across Intramuros with the same quick-scan flow used in Dining.</p>
+
+    <form class="search-row attractions-search" id="attractionsSearchForm" method="get">
+      <input class="input" id="searchInput" name="q" autocomplete="off" placeholder="Search by landmark, area, or theme">
+      <select class="select" id="categorySelect" name="category" aria-label="Filter by attraction type">
+        <option value="">All attraction types</option>
+        <option value="museum">Museums</option>
+        <option value="church">Churches</option>
+        <option value="fortification">Fortifications &amp; Gates</option>
+        <option value="civic">Plazas, Gardens &amp; Civic Stops</option>
+      </select>
+      <button class="btn btn-primary" id="applyFilters" type="submit">Apply</button>
+    </form>
 
     <nav class="pill-nav" aria-label="Attraction quick filters">
       <button class="pill is-active" type="button" data-category="">All</button>
-      <button class="pill" type="button" data-category="Historic Landmark">Historic Landmark</button>
-      <button class="pill" type="button" data-category="Museum">Museum</button>
-      <button class="pill" type="button" data-category="Religious Heritage">Religious Heritage</button>
+      <button class="pill" type="button" data-category="museum">Museums</button>
+      <button class="pill" type="button" data-category="church">Churches</button>
+      <button class="pill" type="button" data-category="fortification">Fortifications</button>
+      <button class="pill" type="button" data-category="civic">Plazas &amp; Gardens</button>
     </nav>
-
-    <button class="filter-toggle" type="button" aria-expanded="false" aria-controls="filters-panel">Filters</button>
-
-    <section class="filters-panel" id="filters-panel" aria-label="Search and filters">
-      <div class="search-field">
-        <input class="input" id="searchInput" name="q" autocomplete="off" placeholder="Search attractions">
-        <button class="clear-search" id="clearSearch" type="button" aria-label="Clear search">×</button>
-      </div>
-      <select class="select" id="categorySelect" name="category" aria-label="Filter by category">
-        <option value="">All categories</option>
-        <option value="Historic Landmark">Historic Landmark</option>
-        <option value="Museum">Museum</option>
-        <option value="Religious Heritage">Religious Heritage</option>
-        <option value="Historic Fortification">Historic Fortification</option>
-        <option value="Plaza">Plaza</option>
-        <option value="City Gate">City Gate</option>
-        <option value="Park">Park</option>
-        <option value="Memorial">Memorial</option>
-      </select>
-    </section>
   </section>
 
   <section class="section attractions-results" aria-live="polite">
-    <div id="items" class="attractions-grid-wrap"></div>
+    <div class="section-header attractions-results-head">
+      <div>
+        <h2>Explore the District</h2>
+        <p id="resultsSummary">Loading attractions...</p>
+      </div>
+    </div>
+    <div id="items"></div>
   </section>
 </main>
 
 <footer class="footer">
-  <div class="attractions-shell">Explore more: routes, dining, and services in Intramuros.</div>
+  <div class="container">Pair attraction stops with nearby routes, dining, and services for a smoother visit.</div>
 </footer>
 
 <script src="/qrventure/js/public-header.js"></script>
