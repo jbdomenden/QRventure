@@ -44,7 +44,7 @@ Optional:
 - `DB_POOL_MAX_SIZE`
 - `RENDER_EXTERNAL_URL=https://your-service.onrender.com`
 
-If you use Supabase, point those env vars at your Supabase Postgres connection. The app will create missing tables and bootstrap a small baseline set of emergency hotlines and fast-food dining entries when their slugs are missing. Broader tourism content still comes from your database.
+If you use Supabase, point those env vars at your Supabase Postgres connection. The app will create missing tables and bootstrap a small baseline set of landmark attractions, suggested walking routes, emergency hotlines, and dining entries when their slugs are missing. Broader tourism content still comes from your database.
 
 ## Local run
 
